@@ -5,6 +5,7 @@
 - **Local dev:** create `.env.local` (never committed)
 - **Cloudflare Worker (recommended for production):** store as Worker secret `ARC_API_KEY`
 - **GitHub Actions (optional build-time fetch):** store as repo secret `ARC_API_KEY`
+- **Frontend runtime base URL (public, safe):** set repo variable `PUBLIC_API_PROXY_URL`
 
 Never expose keys in client code and never use `PUBLIC_` prefix for secrets.
 
@@ -27,6 +28,8 @@ Use `cloudflare/multi-api-proxy-worker.js` so browser requests never contain API
 
 - Deploy Worker
 - Add secret: `ARC_API_KEY`
+- Worker deployed name: `arcraided-api-proxy`
+- Worker URL: `https://arcraided-api-proxy.kubilay12344.workers.dev`
 - Call from frontend:
 
 ```text
