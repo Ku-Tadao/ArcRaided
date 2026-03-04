@@ -131,13 +131,14 @@ export const WEAPON_TYPES = [
 export const ITEM_CATEGORIES = [
     'All',
     'Weapons',
-    'Materials',
+    'Recyclables',
+    'Blueprints',
     'Consumables',
     'Mods',
-    'Blueprints',
+    'Trinkets',
+    'Materials',
     'Keys',
-    'Gadgets',
-    'Throwables',
+    'Gear',
     'Other',
 ] as const;
 
@@ -150,13 +151,14 @@ export type ItemCategory = typeof ITEM_CATEGORIES[number];
 export function categorizeItem(type: string): ItemCategory {
     const t = type.toLowerCase();
     if (WEAPON_TYPES.includes(t as WeaponType)) return 'Weapons';
-    if (t.includes('material') || t === 'nature') return 'Materials';
+    if (t === 'recyclable') return 'Recyclables';
+    if (t === 'blueprint') return 'Blueprints';
     if (t === 'consumable' || t === 'quick use') return 'Consumables';
     if (t === 'modification' || t === 'mod') return 'Mods';
-    if (t === 'blueprint') return 'Blueprints';
+    if (t === 'trinket') return 'Trinkets';
+    if (t.includes('material') || t === 'nature') return 'Materials';
     if (t === 'key') return 'Keys';
-    if (t === 'gadget') return 'Gadgets';
-    if (t === 'throwable') return 'Throwables';
+    if (t === 'augment' || t === 'ammunition' || t === 'shield' || t === 'special') return 'Gear';
     return 'Other';
 }
 

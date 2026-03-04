@@ -6,12 +6,17 @@ import { ARDB_BASE } from '@/lib/types';
 interface Props {
     quests: ArdbQuest[];
     traders: string[];
+    maps: string[];
 }
 
-const { quests, traders } = Astro.props;
+const { quests, traders, maps } = Astro.props;
 
 const traderCounts = Object.fromEntries(
     traders.map(t => [t, quests.filter(q => q.trader?.name === t).length])
+);
+
+const mapCounts = Object.fromEntries(
+    maps.map(m => [m, quests.filter(q => q.maps?.some(qm => qm.name === m)).length])
 );
 ---
 
@@ -28,6 +33,13 @@ const traderCounts = Object.fromEntries(
         <button class="cat-filter active" data-trader="all" type="button">All <span class="count">{quests.length}</span></button>
         {traders.map((t) => (
             <button class="cat-filter" data-trader={t} type="button">{t} <span class="count">{traderCounts[t]}</span></button>
+        ))}
+    </div>
+
+    <div class="category-filters" id="mapFilters" style="margin-top: 0.25rem;">
+        <button class="cat-filter active" data-map="all" type="button">All Maps</button>
+        {maps.map((m) => (
+            <button class="cat-filter" data-map={m} type="button">{m} <span class="count">{mapCounts[m]}</span></button>
         ))}
     </div>
 

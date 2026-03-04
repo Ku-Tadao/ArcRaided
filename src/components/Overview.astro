@@ -14,8 +14,8 @@ interface Props {
 const { items, enemies, quests, maps, traders } = Astro.props;
 
 const weaponCount = items.filter(i => i.category === 'Weapons').length;
-const materialCount = items.filter(i => i.category === 'Materials').length;
-const consumableCount = items.filter(i => i.category === 'Consumables').length;
+const recyclableCount = items.filter(i => i.category === 'Recyclables').length;
+const blueprintCount = items.filter(i => i.category === 'Blueprints').length;
 
 const shuffled = [...enemies].sort(() => Math.random() - 0.5);
 const stripEnemies = shuffled.slice(0, Math.min(12, enemies.length));
@@ -76,7 +76,7 @@ function resolveImg(path: string | undefined): string {
             <div class="ql-icon ql-items"><Fragment set:html={SVG_ICONS.package} /></div>
             <div>
                 <div class="ql-title">Item Database</div>
-                <p class="ql-desc">{weaponCount} weapons, {materialCount} materials, {consumableCount} consumables &amp; more</p>
+                <p class="ql-desc">{weaponCount} weapons, {recyclableCount} recyclables, {blueprintCount} blueprints &amp; more</p>
             </div>
         </div>
         <div class="ql-card" data-section="enemies">

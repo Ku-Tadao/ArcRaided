@@ -1,7 +1,7 @@
 ---
 import { SVG_ICONS } from '@/lib/icons';
 import type { ArdbItem } from '@/lib/types';
-import { ITEM_CATEGORIES, ARDB_BASE } from '@/lib/types';
+import { ITEM_CATEGORIES, WEAPON_TYPES, ARDB_BASE } from '@/lib/types';
 
 interface Props {
     items: ArdbItem[];
@@ -13,6 +13,11 @@ const rarities = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 
 const catCounts = Object.fromEntries(
     ITEM_CATEGORIES.map(cat => [cat, cat === 'All' ? items.length : items.filter(i => i.category === cat).length])
+);
+
+const weapons = items.filter(i => i.category === 'Weapons');
+const weaponTypeCounts = Object.fromEntries(
+    WEAPON_TYPES.map(wt => [wt, weapons.filter(w => w.type.toLowerCase() === wt.toLowerCase()).length])
 );
 ---
 
@@ -47,6 +52,15 @@ const catCounts = Object.fromEntries(
         ))}
     </div>
 
+    <div class="category-filters hidden" id="weaponTypeFilters" style="margin-top: 0.25rem;">
+        <button class="cat-filter active" data-weapon-type="all" type="button">All Types <span class="count">{weapons.length}</span></button>
+        {WEAPON_TYPES.map((wt) => (
+            <button class="cat-filter" data-weapon-type={wt.toLowerCase()} type="button">
+                {wt} <span class="count">{weaponTypeCounts[wt]}</span>
+            </button>
+        ))}
+    </div>
+
     <div class="items-grid" id="itemGrid">
         {items.map((item) => (
             <div
@@ -54,6 +68,7 @@ const catCounts = Object.fromEntries(
                 data-rarity={item.rarity ?? 'common'}
                 data-category={item.category}
                 data-type={item.type}
+                data-weapon-type={item.type.toLowerCase()}
                 data-name={item.name.toLowerCase()}
                 data-id={item.id}
             >

@@ -102,10 +102,13 @@
     const itemGrid = $('#itemGrid');
     const categoryBtns = $$('#categoryFilters .cat-filter');
     const rarityBtns = $$('#rarityFilters .cat-filter');
+    const weaponTypeBtns = $$('#weaponTypeFilters .cat-filter');
+    const weaponTypeFilters = $('#weaponTypeFilters');
     const noItemResults = $('#noItemResults');
 
     let activeCategory = 'All';
     let activeRarity = 'all';
+    let activeWeaponType = 'all';
 
     function filterItems() {
         if (!itemGrid) return;
@@ -118,12 +121,14 @@
             const type = card.dataset.type || '';
             const cat = card.dataset.category || '';
             const rarity = card.dataset.rarity || '';
+            const weaponType = card.dataset.weaponType || '';
 
             const matchQuery = !query || name.includes(query) || type.toLowerCase().includes(query);
             const matchCat = activeCategory === 'All' || cat === activeCategory;
             const matchRarity = activeRarity === 'all' || rarity === activeRarity;
+            const matchWeaponType = activeWeaponType === 'all' || activeCategory !== 'Weapons' || weaponType === activeWeaponType;
 
-            const show = matchQuery && matchCat && matchRarity;
+            const show = matchQuery && matchCat && matchRarity && matchWeaponType;
             card.classList.toggle('hidden', !show);
             if (show) visible++;
         });
@@ -138,6 +143,18 @@
             categoryBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             activeCategory = btn.dataset.category;
+
+            // Show/hide weapon-type sub-filter
+            if (weaponTypeFilters) {
+                if (activeCategory === 'Weapons') {
+                    weaponTypeFilters.classList.remove('hidden');
+                } else {
+                    weaponTypeFilters.classList.add('hidden');
+                    activeWeaponType = 'all';
+                    weaponTypeBtns.forEach(b => b.classList.toggle('active', b.dataset.weaponType === 'all'));
+                }
+            }
+
             filterItems();
         });
     });
@@ -147,6 +164,15 @@
             rarityBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             activeRarity = btn.dataset.rarity;
+            filterItems();
+        });
+    });
+
+    weaponTypeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            weaponTypeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeWeaponType = btn.dataset.weaponType;
             filterItems();
         });
     });
@@ -290,12 +316,14 @@
     const questSearch = $('#questSearch');
     const questList = $('#questList');
     const traderBtns = $$('#traderFilters .cat-filter');
+    const mapBtns = $$('#mapFilters .cat-filter');
     const noQuestResults = $('#noQuestResults');
     const questModal = $('#questModal');
     const closeQuestModalBtn = $('#closeQuestModalBtn');
     const modalQuestDetails = $('#modalQuestDetails');
 
     let activeTrader = 'all';
+    let activeMap = 'all';
 
     function filterQuests() {
         if (!questList) return;
@@ -310,8 +338,9 @@
 
             const matchQuery = !query || name.includes(query) || trader.toLowerCase().includes(query) || maps.includes(query);
             const matchTrader = activeTrader === 'all' || trader === activeTrader;
+            const matchMap = activeMap === 'all' || maps.includes(activeMap.toLowerCase());
 
-            const show = matchQuery && matchTrader;
+            const show = matchQuery && matchTrader && matchMap;
             card.classList.toggle('hidden', !show);
             if (show) visible++;
         });
@@ -326,6 +355,15 @@
             traderBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             activeTrader = btn.dataset.trader;
+            filterQuests();
+        });
+    });
+
+    mapBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            mapBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeMap = btn.dataset.map;
             filterQuests();
         });
     });
