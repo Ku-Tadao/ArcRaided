@@ -1,0 +1,64 @@
+---
+import { SVG_ICONS } from '@/lib/icons';
+import type { TFTItem } from '@/lib/types';
+
+interface Props {
+  items: TFTItem[];
+}
+
+const { items } = Astro.props;
+
+const components = items.filter(i => i.category === 'component');
+const completed = items.filter(i => i.category === 'completed');
+const emblems = items.filter(i => i.category === 'emblem');
+const artifacts = items.filter(i => i.category === 'artifact');
+const radiant = items.filter(i => i.category === 'radiant');
+const support = items.filter(i => i.category === 'support');
+
+const categories = [
+  { key: 'component', label: 'Components', icon: SVG_ICONS.grid, items: components },
+  { key: 'completed', label: 'Completed', icon: SVG_ICONS.sword, items: completed },
+  { key: 'emblem', label: 'Emblems', icon: SVG_ICONS.crown, items: emblems },
+  { key: 'artifact', label: 'Artifacts', icon: SVG_ICONS.gem, items: artifacts },
+  { key: 'radiant', label: 'Radiant', icon: SVG_ICONS.sparkle, items: radiant },
+  { key: 'support', label: 'Support', icon: SVG_ICONS.shield, items: support },
+].filter(c => c.items.length > 0);
+
+const totalShown = categories.reduce((s, c) => s + c.items.length, 0);
+---
+
+<section id="items" class="content" style="display:none">
+    <div class="section-header">
+        <h2>Items</h2>
+        <div class="search-filter">
+            <span class="search-icon"><Fragment set:html={SVG_ICONS.search} /></span>
+            <input type="text" id="itemSearch" placeholder="Search items..." />
+        </div>
+    </div>
+
+    <div class="item-category-filters" id="itemCategoryFilters">
+        <button class="item-cat-filter active" data-cat="all" type="button">All <span class="count">{totalShown}</span></button>
+        {categories.map(cat => (
+            <button class="item-cat-filter" data-cat={cat.key} type="button">
+                <Fragment set:html={cat.icon} /> {cat.label} <span class="count">{cat.items.length}</span>
+            </button>
+        ))}
+    </div>
+
+    {categories.map(cat => (
+        <div class="item-section" data-item-cat={cat.key}>
+            <h3 class="item-section-title">{cat.label}</h3>
+            <div class="items-grid">
+                {cat.items.map(item => (
+                    <div class={`item-card${cat.key === 'radiant' ? ' item-radiant' : ''}${cat.key === 'artifact' ? ' item-artifact' : ''}`}
+                         data-item-id={item.uniqueId}
+                         data-item-name={item.name.toLowerCase()}
+                         data-item-type={cat.key}>
+                        {item.icon && <img src={item.icon} alt={item.name} loading="lazy" class="item-icon" />}
+                        <span class="item-name">{item.name}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    ))}
+</section>

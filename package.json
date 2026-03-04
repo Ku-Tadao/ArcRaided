@@ -1,0 +1,32 @@
+{
+  "name": "arcraided",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Static ARC Raiders data hub built with Astro.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ku-Tadao/ArcRaided.git"
+  },
+  "keywords": [
+    "arc-raiders",
+    "embark-studios",
+    "extraction-shooter",
+    "static-site",
+    "astro"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ku-Tadao/ArcRaided/issues"
+  },
+  "homepage": "https://github.com/Ku-Tadao/ArcRaided#readme",
+  "dependencies": {
+    "astro": "^5.18.0"
+  }
+}

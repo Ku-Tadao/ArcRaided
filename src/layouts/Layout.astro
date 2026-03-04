@@ -1,0 +1,49 @@
+---
+import '@/styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+    title = 'ArcRaided — ARC Raiders Hub',
+    description = 'ArcRaided project scaffold for ARC Raiders built with Astro.',
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>{title}</title>
+    <meta name="description" content={description}>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script is:inline>if(location.hash)history.replaceState(null,'',location.pathname+location.search);if('scrollRestoration'in history)history.scrollRestoration='manual';</script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-bar">
+                <div class="header-brand">
+                    <h1>ArcRaided</h1>
+                    <span class="version-pill">ARC RAIDERS</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <slot />
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>ArcRaided &middot; ARC Raiders project scaffold</p>
+        </div>
+    </footer>
+</body>
+</html>
