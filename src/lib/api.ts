@@ -138,3 +138,5 @@ export function resolveArdbImage(path: string | undefined): string {
     if (path.startsWith('http')) return path;
     return `${ARDB_BASE}${path}`;
 }
+
+export { ARDB_BASE };

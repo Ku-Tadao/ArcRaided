@@ -109,7 +109,7 @@ Usage requirements:
 Image/icon paths:
 
 - ARDB returns relative icon/image paths
-- Prefix with `https://ardb.app/static`
+- Prefix with `https://ardb.app/static` (NOT `https://ardb.app` — that returns Next.js HTML 404s)
 
 ## Common Error Handling
 

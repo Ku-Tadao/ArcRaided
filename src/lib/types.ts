@@ -161,4 +161,4 @@ export function categorizeItem(type: string): ItemCategory {
 }
 
 /** Image URL prefix for ARDB relative paths */
-export const ARDB_BASE = 'https://ardb.app';
+export const ARDB_BASE = 'https://ardb.app/static';

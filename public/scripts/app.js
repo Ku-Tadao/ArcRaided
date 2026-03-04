@@ -6,7 +6,7 @@
 (function () {
     'use strict';
 
-    const ARDB_BASE = 'https://ardb.app';
+    const ARDB_BASE = 'https://ardb.app/static';
 
     // ---------- Helpers ----------
     const $ = (sel, ctx = document) => ctx.querySelector(sel);
