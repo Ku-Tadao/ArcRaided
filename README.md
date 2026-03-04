@@ -18,6 +18,7 @@ npm run build
 
 - API key is stored only in Cloudflare Worker secret `ARC_API_KEY`.
 - Frontend only uses the public proxy URL (`PUBLIC_API_PROXY_URL`).
+- Provider switching supported via proxy paths: `arc`, `metaforge`, `ardb`.
 - Proxy worker template: `cloudflare/multi-api-proxy-worker.js`.
 - Full setup guide: [docs/API_SETUP.md](docs/API_SETUP.md)
 

@@ -11,6 +11,14 @@ const PROVIDERS = {
     secretName: 'ARC_API_KEY',
     prefix: '/api/v1/',
   },
+  metaforge: {
+    baseUrl: 'https://metaforge.app',
+    prefix: '/api/',
+  },
+  ardb: {
+    baseUrl: 'https://ardb.app',
+    prefix: '/api/',
+  },
 };
 
 function json(data, status = 200) {
@@ -59,8 +67,9 @@ export default {
       return badRequest(`Unknown provider: ${parsed.providerKey}`, 404);
     }
 
-    const secret = env[provider.secretName];
-    if (!secret) {
+    const needsSecret = Boolean(provider.secretName && provider.keyHeader);
+    const secret = needsSecret ? env[provider.secretName] : null;
+    if (needsSecret && !secret) {
       return badRequest(`Missing worker secret: ${provider.secretName}`, 500);
     }
 
@@ -71,11 +80,9 @@ export default {
     const upstream = new URL(parsed.targetPath, provider.baseUrl);
     upstream.search = url.search;
 
-    const upstreamResponse = await fetch(upstream.toString(), {
-      headers: {
-        [provider.keyHeader]: secret,
-      },
-    });
+    const headers = needsSecret ? { [provider.keyHeader]: secret } : undefined;
+
+    const upstreamResponse = await fetch(upstream.toString(), headers ? { headers } : undefined);
 
     const text = await upstreamResponse.text();
 
