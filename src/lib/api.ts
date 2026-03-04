@@ -4,6 +4,8 @@ import type {
     ArdbEnemy,
     ArdbQuest,
     MetaForgeArc,
+    MetaForgeItem,
+    MetaForgeQuest,
     ArcRaidedData,
 } from './types';
 import { categorizeItem, ARDB_BASE } from './types';
@@ -91,13 +93,32 @@ async function fetchQuests(): Promise<ArdbQuest[]> {
     return safeJSON<ArdbQuest[]>('/proxy/ardb/api/quests', []);
 }
 
+// ---------- MetaForge Items ----------
+
+async function fetchMetaForgeItems(): Promise<MetaForgeItem[]> {
+    const raw = await safeJSON<{ data: MetaForgeItem[] }>('/proxy/metaforge/api/arc-raiders/items', { data: [] });
+    return (raw.data || []).map((item) => ({
+        ...item,
+        category: categorizeItem(item.item_type),
+    }));
+}
+
+// ---------- MetaForge Quests ----------
+
+async function fetchMetaForgeQuests(): Promise<MetaForgeQuest[]> {
+    const raw = await safeJSON<{ data: MetaForgeQuest[] }>('/proxy/metaforge/api/arc-raiders/quests', { data: [] });
+    return raw.data || [];
+}
+
 // ---------- Main aggregation ----------
 
 export async function fetchAllData(): Promise<ArcRaidedData> {
-    const [items, enemies, quests] = await Promise.all([
+    const [items, enemies, quests, mfItems, mfQuests] = await Promise.all([
         fetchItems(),
         fetchEnemies(),
         fetchQuests(),
+        fetchMetaForgeItems(),
+        fetchMetaForgeQuests(),
     ]);
 
     // Extract unique maps
@@ -125,6 +146,10 @@ export async function fetchAllData(): Promise<ArcRaidedData> {
             questCount: quests.length,
             mapCount: maps.length,
             traderCount: traders.length,
+        },
+        metaforge: {
+            items: mfItems,
+            quests: mfQuests,
         },
     };
 }

@@ -18,6 +18,10 @@ const clientPayload = JSON.stringify({
     enemies: data.enemies.map(e => ({ id: e.id, name: e.name, description: e.description, icon: e.icon, image: e.image, dropTable: e.dropTable, relatedMaps: e.relatedMaps })),
     quests: data.quests.map(q => ({ id: q.id, title: q.title, description: q.description, trader: q.trader, maps: q.maps, steps: q.steps, requiredItems: q.requiredItems, xpReward: q.xpReward })),
     buildInfo: data.buildInfo,
+    metaforge: {
+        items: data.metaforge.items.map(i => ({ id: i.id, name: i.name, type: i.item_type, rarity: i.rarity, category: i.category, description: i.description, value: i.value, icon: i.icon, stat_block: i.stat_block, trader_price: i.trader_price, ammo_type: i.ammo_type, loadout_slots: i.loadout_slots })),
+        quests: data.metaforge.quests.map(q => ({ id: q.id, title: q.name, objectives: q.objectives, xp: q.xp, trader_name: q.trader_name, image: q.image, rewards: q.rewards, guide_links: q.guide_links })),
+    },
 });
 ---
 

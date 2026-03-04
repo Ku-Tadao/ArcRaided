@@ -50,7 +50,16 @@ const {
                 <button class="nav-link" data-section="enemies" type="button">Enemies</button>
                 <button class="nav-link" data-section="quests" type="button">Quests</button>
             </div>
-            <div class="product-switcher">
+            <div class="nav-right">
+                <div class="source-toggle" id="sourceToggle">
+                    <button class="source-btn active" data-source="ardb" type="button" title="ARDB — 483 items, 84 quests">
+                        <span class="source-dot ardb"></span>ARDB
+                    </button>
+                    <button class="source-btn" data-source="metaforge" type="button" title="MetaForge — 50 items, 40 quests, stat blocks">
+                        <span class="source-dot metaforge"></span>MetaForge
+                    </button>
+                </div>
+                <div class="product-switcher">
                 <button class="product-switcher-btn" type="button" id="productSwitcherBtn">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor" opacity=".3"/></svg>
                     Apps
@@ -86,6 +95,7 @@ const {
                         </div>
                     </a>
                 </div>
+            </div>
             </div>
         </div>
     </nav>

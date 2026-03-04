@@ -89,6 +89,59 @@ export interface MetaForgeArc {
     image: string;        // full CDN URL from Supabase
 }
 
+// ---------- MetaForge Item ----------
+export interface MetaForgeItem {
+    id: string;
+    name: string;
+    description: string;
+    item_type: string;
+    rarity: string;
+    value: number;
+    icon: string;          // full CDN URL
+    stat_block?: Record<string, number | string>;
+    subcategory?: string;
+    ammo_type?: string;
+    shield_type?: string;
+    loot_area?: string;
+    flavor_text?: string;
+    loadout_slots?: string[];
+    workbench?: unknown;
+    trader_price?: number;
+    /** Attached at runtime */
+    category?: string;
+}
+
+// ---------- MetaForge Quest ----------
+export interface MetaForgeQuest {
+    id: string;
+    name: string;
+    objectives: string[];
+    xp: number;
+    trader_name: string;
+    image?: string;          // full CDN URL
+    locations: string[];
+    rewards: MetaForgeQuestReward[];
+    guide_links: { url: string; label: string }[];
+    required_items: unknown[];
+    sort_order?: number;
+}
+
+export interface MetaForgeQuestReward {
+    id: string;
+    item_id: string;
+    quantity: string;
+    item: {
+        id: string;
+        name: string;
+        icon: string;
+        rarity: string;
+        item_type: string;
+    };
+}
+
+// ---------- Data Provider ----------
+export type DataProvider = 'ardb' | 'metaforge';
+
 // ---------- Unified App Data ----------
 export interface ArcRaidedData {
     items: ArdbItem[];
@@ -97,6 +150,10 @@ export interface ArcRaidedData {
     maps: string[];
     traders: string[];
     buildInfo: BuildInfo;
+    metaforge: {
+        items: MetaForgeItem[];
+        quests: MetaForgeQuest[];
+    };
 }
 
 export interface BuildInfo {
