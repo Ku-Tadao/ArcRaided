@@ -21,6 +21,7 @@ npm run build
 - Provider switching supported via proxy paths: `arc`, `metaforge`, `ardb`.
 - Proxy worker template: `cloudflare/multi-api-proxy-worker.js`.
 - Full setup guide: [docs/API_SETUP.md](docs/API_SETUP.md)
+- Full endpoint docs: [docs/API_REFERENCE.md](docs/API_REFERENCE.md)
 
 ## Notes
 

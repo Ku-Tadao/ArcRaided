@@ -1,5 +1,7 @@
 # API Setup (secure)
 
+See full endpoint reference: [API_REFERENCE.md](API_REFERENCE.md)
+
 ## Where to put your ARC Raiders API key
 
 - **Cloudflare Worker:** store as Worker secret `ARC_API_KEY`
