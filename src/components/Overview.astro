@@ -1,109 +1,112 @@
 ---
-import type { ArcRaidedData } from '@/lib/types';
-import { icons } from '@/lib/icons';
+import { SVG_ICONS } from '@/lib/icons';
+import type { ArdbItem, ArdbEnemy, ArdbQuest } from '@/lib/types';
+import { ARDB_BASE } from '@/lib/types';
 
 interface Props {
-    data: ArcRaidedData;
+    items: ArdbItem[];
+    enemies: ArdbEnemy[];
+    quests: ArdbQuest[];
+    maps: string[];
+    traders: string[];
 }
 
-const { data } = Astro.props;
-const { items, enemies, quests, maps, traders, buildInfo } = data;
+const { items, enemies, quests, maps, traders } = Astro.props;
 
-// Count items by category
-const weaponCount = items.filter(i => (i.category === 'Weapons')).length;
-const materialCount = items.filter(i => (i.category === 'Materials')).length;
-const consumableCount = items.filter(i => (i.category === 'Consumables')).length;
+const weaponCount = items.filter(i => i.category === 'Weapons').length;
+const materialCount = items.filter(i => i.category === 'Materials').length;
+const consumableCount = items.filter(i => i.category === 'Consumables').length;
+
+const shuffled = [...enemies].sort(() => Math.random() - 0.5);
+const stripEnemies = shuffled.slice(0, Math.min(12, enemies.length));
+
+const featured = enemies.slice(0, Math.min(6, enemies.length));
+
+function resolveImg(path: string | undefined): string {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    return `${ARDB_BASE}${path}`;
+}
 ---
 
-<section class="section" id="overview" data-section="overview">
-    <!-- Splash -->
+<section id="overview" class="content">
     <div class="overview-splash">
-        <div class="overview-splash-top-bar"></div>
-        <div class="overview-splash-content">
-            <h2>ArcRaided</h2>
-            <p>Your complete Arc Raiders data hub. Browse items, enemies, quests, and traders — all in one place.</p>
+        <div class="splash-inner">
+            <h2>Arc Raiders <span>Data Hub</span></h2>
+            <p class="splash-sub">Explore items, enemies, quests, and traders for Arc Raiders. All data powered by community APIs.</p>
+
+            <div class="hero-portrait-strip">
+                {stripEnemies.map(e => (
+                    <img
+                        src={resolveImg(e.image) || resolveImg(e.icon)}
+                        alt={e.name}
+                        loading="lazy"
+                        title={e.name}
+                    />
+                ))}
+            </div>
         </div>
     </div>
 
-    <!-- Stats Row -->
-    <div class="stats-row">
-        <div class="stat-card">
-            <span class="stat-value">{buildInfo.itemCount}</span>
-            <span class="stat-label">Items</span>
+    <div class="overview-stats-row">
+        <div class="ov-stat ov-total" data-section="items">
+            <div class="ov-num">{items.length}</div>
+            <div class="ov-label"><Fragment set:html={SVG_ICONS.package} /> Items</div>
         </div>
-        <div class="stat-card">
-            <span class="stat-value">{buildInfo.enemyCount}</span>
-            <span class="stat-label">ARC Enemies</span>
+        <div class="ov-stat ov-weapons" data-section="items">
+            <div class="ov-num">{weaponCount}</div>
+            <div class="ov-label"><Fragment set:html={SVG_ICONS.crosshair} /> Weapons</div>
         </div>
-        <div class="stat-card">
-            <span class="stat-value">{buildInfo.questCount}</span>
-            <span class="stat-label">Quests</span>
+        <div class="ov-stat ov-enemies" data-section="enemies">
+            <div class="ov-num">{enemies.length}</div>
+            <div class="ov-label"><Fragment set:html={SVG_ICONS.target} /> Enemies</div>
         </div>
-        <div class="stat-card">
-            <span class="stat-value">{buildInfo.mapCount}</span>
-            <span class="stat-label">Maps</span>
+        <div class="ov-stat ov-quests" data-section="quests">
+            <div class="ov-num">{quests.length}</div>
+            <div class="ov-label"><Fragment set:html={SVG_ICONS.scroll} /> Quests</div>
         </div>
-        <div class="stat-card">
-            <span class="stat-value">{buildInfo.traderCount}</span>
-            <span class="stat-label">Traders</span>
+        <div class="ov-stat ov-maps" data-section="overview">
+            <div class="ov-num">{maps.length}</div>
+            <div class="ov-label"><Fragment set:html={SVG_ICONS.compass} /> Maps</div>
         </div>
     </div>
 
-    <!-- Quick Links -->
-    <div class="quick-links">
-        <button class="quick-link-card" data-goto="items">
-            <div class="quick-link-icon" style="color: var(--rarity-rare);" set:html={icons.package} />
-            <div class="quick-link-info">
-                <strong>Items</strong>
-                <span>{weaponCount} weapons, {materialCount} materials, {consumableCount} consumables & more</span>
+    <div class="ql-grid">
+        <div class="ql-card" data-section="items">
+            <div class="ql-icon ql-items"><Fragment set:html={SVG_ICONS.package} /></div>
+            <div>
+                <div class="ql-title">Item Database</div>
+                <p class="ql-desc">{weaponCount} weapons, {materialCount} materials, {consumableCount} consumables &amp; more</p>
             </div>
-            <span class="quick-link-arrow" set:html={icons.chevronRight} />
-        </button>
-        <button class="quick-link-card" data-goto="enemies">
-            <div class="quick-link-icon" style="color: var(--rarity-epic);" set:html={icons.crosshair} />
-            <div class="quick-link-info">
-                <strong>ARC Enemies</strong>
-                <span>{enemies.length} enemies with drop tables & spawn maps</span>
+        </div>
+        <div class="ql-card" data-section="enemies">
+            <div class="ql-icon ql-enemies"><Fragment set:html={SVG_ICONS.crosshair} /></div>
+            <div>
+                <div class="ql-title">ARC Enemies</div>
+                <p class="ql-desc">{enemies.length} enemies with drop tables &amp; spawn maps</p>
             </div>
-            <span class="quick-link-arrow" set:html={icons.chevronRight} />
-        </button>
-        <button class="quick-link-card" data-goto="quests">
-            <div class="quick-link-icon" style="color: var(--rarity-legendary);" set:html={icons.scroll} />
-            <div class="quick-link-info">
-                <strong>Quests</strong>
-                <span>{quests.length} quests from {traders.length} traders across {maps.length} maps</span>
+        </div>
+        <div class="ql-card" data-section="quests">
+            <div class="ql-icon ql-quests"><Fragment set:html={SVG_ICONS.scroll} /></div>
+            <div>
+                <div class="ql-title">Quests</div>
+                <p class="ql-desc">{quests.length} quests from {traders.length} traders across {maps.length} maps</p>
             </div>
-            <span class="quick-link-arrow" set:html={icons.chevronRight} />
-        </button>
+        </div>
     </div>
 
-    <!-- Map list -->
-    <div class="section-header">
-        <h3>Maps</h3>
+    <div class="featured-section">
+        <h3>Featured Enemies</h3>
+        <div class="featured-heroes-row">
+            {featured.map(e => (
+                <div class="featured-hero" data-enemy-id={e.id}>
+                    <img src={resolveImg(e.image) || resolveImg(e.icon)} alt={e.name} loading="lazy" />
+                    <div class="fh-info">
+                        <div class="fh-name">{e.name}</div>
+                        <div class="fh-role" style="color:var(--rarity-epic)">{e.dropTable.length} drops</div>
+                    </div>
+                </div>
+            ))}
+        </div>
     </div>
-    <div class="stats-row" style="grid-template-columns: repeat(auto-fit, minmax(180px,1fr));">
-        {maps.map(m => (
-            <div class="stat-card">
-                <span class="stat-label" set:html={icons.compass} />
-                <span class="stat-value" style="font-size: 1rem;">{m}</span>
-            </div>
-        ))}
-    </div>
-
-    <!-- Trader list -->
-    <div class="section-header">
-        <h3>Traders</h3>
-    </div>
-    <div class="stats-row" style="grid-template-columns: repeat(auto-fit, minmax(140px,1fr));">
-        {traders.map(t => (
-            <div class="stat-card">
-                <span class="stat-label" set:html={icons.users} />
-                <span class="stat-value" style="font-size: 1rem;">{t}</span>
-            </div>
-        ))}
-    </div>
-
-    <p class="footer-disclaimer" style="text-align: center; margin-top: 2rem;">
-        Last updated: {new Date(buildInfo.generatedAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
-    </p>
 </section>

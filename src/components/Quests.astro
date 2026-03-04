@@ -1,7 +1,7 @@
 ---
+import { SVG_ICONS } from '@/lib/icons';
 import type { ArdbQuest } from '@/lib/types';
 import { ARDB_BASE } from '@/lib/types';
-import { icons } from '@/lib/icons';
 
 interface Props {
     quests: ArdbQuest[];
@@ -9,176 +9,63 @@ interface Props {
 }
 
 const { quests, traders } = Astro.props;
+
+const traderCounts = Object.fromEntries(
+    traders.map(t => [t, quests.filter(q => q.trader?.name === t).length])
+);
 ---
 
-<section class="section hidden" id="quests" data-section="quests">
+<section id="quests" class="content" style="display:none">
     <div class="section-header">
-        <h3>Quests</h3>
-        <span class="section-count">{quests.length} quests</span>
+        <h2>Quests</h2>
+        <div class="search-filter">
+            <span class="search-icon"><Fragment set:html={SVG_ICONS.search} /></span>
+            <input type="text" id="questSearch" placeholder="Search quests..." />
+        </div>
     </div>
 
-    <!-- Search -->
-    <div class="search-filter">
-        <span class="search-icon" set:html={icons.search} />
-        <input type="text" id="questSearch" placeholder="Search quests by name, trader, or map..." autocomplete="off" />
-    </div>
-
-    <!-- Trader Filters -->
     <div class="category-filters" id="traderFilters">
-        <button class="filter-btn active" data-trader="all" type="button">All Traders</button>
+        <button class="cat-filter active" data-trader="all" type="button">All <span class="count">{quests.length}</span></button>
         {traders.map((t) => (
-            <button class="filter-btn" data-trader={t} type="button">{t}</button>
+            <button class="cat-filter" data-trader={t} type="button">{t} <span class="count">{traderCounts[t]}</span></button>
         ))}
     </div>
 
-    <!-- Quest List -->
-    <div class="quest-list" id="questList">
+    <div class="quests-grid" id="questList">
         {quests.map((quest) => {
             const traderIcon = quest.trader?.icon
                 ? `${ARDB_BASE}${quest.trader.icon}`
                 : '';
 
             return (
-                <button
+                <div
                     class="quest-card"
                     data-id={quest.id}
                     data-trader={quest.trader?.name ?? ''}
                     data-name={quest.title.toLowerCase()}
                     data-maps={quest.maps?.map(m => m.name).join(',').toLowerCase() ?? ''}
-                    type="button"
                 >
-                    <div class="quest-card-icon">
+                    <div class="quest-card-img" style="border-radius:50%;">
                         {traderIcon ? (
-                            <img src={traderIcon} alt={quest.trader.name} width="48" height="48" loading="lazy" />
+                            <img src={traderIcon} alt={quest.trader.name} loading="lazy" style="width:100%;height:100%;object-fit:cover;" />
                         ) : (
-                            <span set:html={icons.scroll} />
+                            <div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;opacity:0.3"><Fragment set:html={SVG_ICONS.scroll} /></div>
                         )}
                     </div>
                     <div class="quest-card-body">
-                        <span class="quest-card-title">{quest.title}</span>
-                        <span class="quest-card-meta">
-                            <span class="quest-trader-name">{quest.trader?.name ?? 'Unknown'}</span>
-                            {quest.maps && quest.maps.length > 0 && (
-                                <span class="quest-maps">
-                                    <span set:html={icons.compass} />
-                                    {quest.maps.map(m => m.name).join(', ')}
-                                </span>
-                            )}
-                        </span>
-                        <span class="quest-card-steps">{quest.steps?.length ?? 0} steps</span>
+                        <div class="quest-card-title">{quest.title}</div>
+                        <div class="quest-card-trader">{quest.trader?.name ?? 'Unknown'}</div>
+                        {quest.maps && quest.maps.length > 0 && (
+                            <div class="quest-card-desc">{quest.maps.map(m => m.name).join(', ')}</div>
+                        )}
+                        <div class="quest-steps">
+                            <span class="quest-step">{quest.steps?.length ?? 0} steps{quest.xpReward ? ` · +${quest.xpReward} XP` : ''}</span>
+                        </div>
                     </div>
-                    <span class="quest-card-arrow" set:html={icons.chevronRight} />
-                </button>
+                </div>
             );
         })}
     </div>
 
     <p class="no-results hidden" id="noQuestResults">No quests match your filters.</p>
 </section>
-
-<style>
-    .quest-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        margin-top: 1.25rem;
-    }
-    .quest-card {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem 1.25rem;
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        cursor: pointer;
-        transition: border-color 0.2s, transform 0.15s;
-        text-align: left;
-        width: 100%;
-    }
-    .quest-card:hover {
-        border-color: var(--brand);
-        transform: translateX(4px);
-    }
-    .quest-card-icon {
-        flex-shrink: 0;
-        width: 48px;
-        height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        background: var(--bg-secondary);
-        overflow: hidden;
-    }
-    .quest-card-icon img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    .quest-card-body {
-        flex: 1;
-        min-width: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 0.2rem;
-    }
-    .quest-card-title {
-        font-family: var(--font-heading);
-        font-weight: 700;
-        font-size: 0.95rem;
-        color: var(--text-primary);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .quest-card-meta {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-        flex-wrap: wrap;
-    }
-    .quest-trader-name {
-        font-weight: 600;
-        color: var(--brand);
-    }
-    .quest-maps {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-    }
-    .quest-maps svg {
-        width: 12px;
-        height: 12px;
-    }
-    .quest-card-steps {
-        font-size: 0.75rem;
-        color: var(--text-secondary);
-    }
-    .quest-card-arrow {
-        flex-shrink: 0;
-        opacity: 0.3;
-        transition: opacity 0.2s;
-    }
-    .quest-card:hover .quest-card-arrow {
-        opacity: 0.7;
-    }
-    .no-results {
-        text-align: center;
-        padding: 3rem 1rem;
-        color: var(--text-secondary);
-        font-size: 0.95rem;
-    }
-
-    @media (max-width: 720px) {
-        .quest-card {
-            padding: 0.75rem 1rem;
-        }
-        .quest-card-icon {
-            width: 40px;
-            height: 40px;
-        }
-    }
-</style>

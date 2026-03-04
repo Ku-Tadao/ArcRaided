@@ -7,20 +7,27 @@ import Quests from '@/components/Quests.astro';
 import { fetchAllData } from '@/lib/api';
 
 const data = await fetchAllData();
----
 
-<Layout>
-    <Overview data={data} />
-    <Items items={data.items} />
-    <Enemies enemies={data.enemies} />
-    <Quests quests={data.quests} traders={data.traders} />
-</Layout>
+const buildDate = new Date(data.buildInfo.generatedAt).toLocaleString('en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+});
 
-<!-- Hydrate data for client JS -->
-<script is:inline define:vars={{ clientPayload: JSON.stringify({
+const clientPayload = JSON.stringify({
     items: data.items.map(i => ({ id: i.id, name: i.name, type: i.type, rarity: i.rarity, category: i.category, description: i.description, value: i.value, icon: i.icon, foundIn: i.foundIn })),
     enemies: data.enemies.map(e => ({ id: e.id, name: e.name, description: e.description, icon: e.icon, image: e.image, dropTable: e.dropTable, relatedMaps: e.relatedMaps })),
     quests: data.quests.map(q => ({ id: q.id, title: q.title, description: q.description, trader: q.trader, maps: q.maps, steps: q.steps, requiredItems: q.requiredItems, xpReward: q.xpReward })),
-}) }}>
-    window.__ARCRAIDED_DATA__ = JSON.parse(clientPayload);
-</script>
+    buildInfo: data.buildInfo,
+});
+---
+
+<Layout buildDate={buildDate}>
+    <div id="app-data" data-payload={clientPayload} style="display:none"></div>
+
+    <Overview items={data.items} enemies={data.enemies} quests={data.quests} maps={data.maps} traders={data.traders} />
+    <Items items={data.items} />
+    <Enemies enemies={data.enemies} />
+    <Quests quests={data.quests} traders={data.traders} />
+
+    <script src="../scripts/app.js"></script>
+</Layout>

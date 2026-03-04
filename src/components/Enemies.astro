@@ -1,144 +1,64 @@
 ---
+import { SVG_ICONS } from '@/lib/icons';
 import type { ArdbEnemy } from '@/lib/types';
 import { ARDB_BASE } from '@/lib/types';
-import { icons } from '@/lib/icons';
 
 interface Props {
     enemies: ArdbEnemy[];
 }
 
 const { enemies } = Astro.props;
+
+function resolveImg(path: string | undefined): string {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    return `${ARDB_BASE}${path}`;
+}
 ---
 
-<section class="section hidden" id="enemies" data-section="enemies">
+<section id="enemies" class="content" style="display:none">
     <div class="section-header">
-        <h3>ARC Enemies</h3>
-        <span class="section-count">{enemies.length} enemies</span>
+        <h2>ARC Enemies</h2>
+        <div class="search-filter">
+            <span class="search-icon"><Fragment set:html={SVG_ICONS.search} /></span>
+            <input type="text" id="enemySearch" placeholder="Search enemies..." />
+        </div>
     </div>
 
-    <!-- Search -->
-    <div class="search-filter">
-        <span class="search-icon" set:html={icons.search} />
-        <input type="text" id="enemySearch" placeholder="Search enemies..." autocomplete="off" />
-    </div>
-
-    <!-- Enemy Grid -->
-    <div class="enemy-grid" id="enemyGrid">
+    <div class="enemies-grid" id="enemyGrid">
         {enemies.map((enemy) => {
-            // Resolve icon — SVGs from ARDB, or images from MetaForge
-            const iconSrc = enemy.icon
-                ? (enemy.icon.startsWith('http') ? enemy.icon : `${ARDB_BASE}${enemy.icon}`)
-                : '';
-            const imageSrc = enemy.image
-                ? (enemy.image.startsWith('http') ? enemy.image : `${ARDB_BASE}${enemy.image}`)
-                : '';
+            const iconSrc = resolveImg(enemy.icon);
+            const imageSrc = resolveImg(enemy.image);
 
             return (
-                <button
-                    class="enemy-card"
-                    data-id={enemy.id}
-                    data-name={enemy.name.toLowerCase()}
-                    type="button"
-                >
-                    <div class="enemy-card-img">
+                <div class="enemy-card" data-id={enemy.id} data-name={enemy.name.toLowerCase()}>
+                    <div class="enemy-card-icon-wrap">
                         {imageSrc ? (
                             <img
                                 src={imageSrc}
                                 alt={enemy.name}
                                 loading="lazy"
-                                width="120"
-                                height="120"
+                                class="enemy-card-icon"
                             />
                         ) : iconSrc ? (
                             <img
                                 src={iconSrc}
                                 alt={enemy.name}
                                 loading="lazy"
-                                width="80"
-                                height="80"
-                                style="filter: invert(1) brightness(0.85);"
+                                class="enemy-card-icon"
                             />
                         ) : (
-                            <span class="enemy-placeholder" set:html={icons.crosshair} />
+                            <div style="opacity:0.25"><Fragment set:html={SVG_ICONS.crosshair} /></div>
                         )}
                     </div>
                     <span class="enemy-card-name">{enemy.name}</span>
                     {enemy.dropTable.length > 0 && (
                         <span class="enemy-card-drops">{enemy.dropTable.length} drops</span>
                     )}
-                </button>
+                </div>
             );
         })}
     </div>
 
     <p class="no-results hidden" id="noEnemyResults">No enemies match your search.</p>
 </section>
-
-<style>
-    .enemy-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 1rem;
-        margin-top: 1.25rem;
-    }
-    .enemy-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 1.5rem 1rem;
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        cursor: pointer;
-        transition: transform 0.15s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-        text-align: center;
-    }
-    .enemy-card:hover {
-        transform: translateY(-2px);
-        border-color: var(--brand);
-        box-shadow: 0 0 20px -4px rgba(8, 145, 178, 0.25);
-    }
-    .enemy-card-img {
-        width: 100px;
-        height: 100px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-    }
-    .enemy-card-img img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-    }
-    .enemy-card-name {
-        font-family: var(--font-heading);
-        font-weight: 700;
-        font-size: 1rem;
-        color: var(--text-primary);
-    }
-    .enemy-card-drops {
-        font-size: 0.75rem;
-        color: var(--text-secondary);
-        background: var(--bg-secondary);
-        padding: 0.15rem 0.5rem;
-        border-radius: 20px;
-    }
-    .enemy-placeholder {
-        opacity: 0.25;
-        color: var(--text-secondary);
-    }
-    .no-results {
-        text-align: center;
-        padding: 3rem 1rem;
-        color: var(--text-secondary);
-        font-size: 0.95rem;
-    }
-
-    @media (max-width: 720px) {
-        .enemy-grid {
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        }
-    }
-</style>

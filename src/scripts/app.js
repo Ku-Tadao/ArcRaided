@@ -25,7 +25,7 @@
 
     function rarityBadge(rarity) {
         const r = rarity || 'common';
-        return `<span class="reward-chip" style="background:var(--rarity-${r});color:#000;font-weight:600;">${capitalize(r)}</span>`;
+        return `<span class="rarity-badge ${r}">${capitalize(r)}</span>`;
     }
 
     // ---------- Theme ----------
@@ -49,12 +49,16 @@
 
     // ---------- Navigation ----------
     const navLinks = $$('.nav-link');
-    const sections = $$('.section');
+    const sections = $$('.content');
 
     function showSection(name) {
         sections.forEach(s => {
-            const match = s.dataset.section === name;
-            s.classList.toggle('hidden', !match);
+            const match = s.id === name;
+            if (match) {
+                s.style.display = '';
+            } else {
+                s.style.display = 'none';
+            }
         });
         navLinks.forEach(l => {
             l.classList.toggle('active', l.dataset.section === name);
@@ -66,14 +70,18 @@
         link.addEventListener('click', () => showSection(link.dataset.section));
     });
 
-    // Quick link navigation (overview cards)
-    $$('[data-goto]').forEach(btn => {
-        btn.addEventListener('click', () => showSection(btn.dataset.goto));
+    // Quick link navigation (overview stat cards & ql-cards)
+    $$('[data-section]').forEach(el => {
+        if (el.classList.contains('nav-link')) return;
+        el.addEventListener('click', () => {
+            const target = el.dataset.section;
+            if (target && target !== 'overview') showSection(target);
+        });
     });
 
     // ---------- Product Switcher ----------
     const switcherBtn = $('#productSwitcherBtn');
-    const switcherDropdown = $('#productDropdown');
+    const switcherDropdown = $('#productSwitcherDropdown');
 
     if (switcherBtn && switcherDropdown) {
         switcherBtn.addEventListener('click', (e) => {
@@ -86,13 +94,14 @@
     }
 
     // ---------- Client Data ----------
-    const DATA = window.__ARCRAIDED_DATA__ || { items: [], enemies: [], quests: [] };
+    const appDataEl = document.getElementById('app-data');
+    const DATA = appDataEl ? JSON.parse(appDataEl.dataset.payload || '{}') : {};
 
     // ---------- Items: Search & Filter ----------
     const itemSearch = $('#itemSearch');
     const itemGrid = $('#itemGrid');
-    const categoryBtns = $$('#categoryFilters .filter-btn');
-    const rarityBtns = $$('#rarityFilters .filter-btn');
+    const categoryBtns = $$('#categoryFilters .cat-filter');
+    const rarityBtns = $$('#rarityFilters .cat-filter');
     const noItemResults = $('#noItemResults');
 
     let activeCategory = 'All';
@@ -110,7 +119,7 @@
             const cat = card.dataset.category || '';
             const rarity = card.dataset.rarity || '';
 
-            const matchQuery = !query || name.includes(query) || type.includes(query);
+            const matchQuery = !query || name.includes(query) || type.toLowerCase().includes(query);
             const matchCat = activeCategory === 'All' || cat === activeCategory;
             const matchRarity = activeRarity === 'all' || rarity === activeRarity;
 
@@ -144,11 +153,11 @@
 
     // ---------- Items: Modal ----------
     const itemModal = $('#itemModal');
-    const itemModalClose = $('#itemModalClose');
+    const closeItemModalBtn = $('#closeItemModalBtn');
     const modalItemDetails = $('#modalItemDetails');
 
     function openItemModal(itemId) {
-        const item = DATA.items.find(i => i.id === itemId);
+        const item = (DATA.items || []).find(i => i.id === itemId);
         if (!item || !itemModal || !modalItemDetails) return;
 
         const imgSrc = resolveImg(item.icon);
@@ -156,29 +165,27 @@
         modalItemDetails.innerHTML = `
             <div class="detail-header">
                 <div class="detail-portrait">
-                    ${imgSrc ? `<img src="${imgSrc}" alt="${item.name}" width="96" height="96" />` : ''}
+                    ${imgSrc ? `<img src="${imgSrc}" alt="${item.name}" style="max-width:100%;max-height:100%;object-fit:contain;" />` : ''}
                 </div>
                 <div class="detail-info">
-                    <h3>${item.name}</h3>
-                    <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                    <h3 class="detail-name">${item.name}</h3>
+                    <div class="detail-tags">
                         ${rarityBadge(item.rarity)}
-                        <span class="reward-chip">${item.type}</span>
-                        ${item.category ? `<span class="reward-chip">${item.category}</span>` : ''}
+                        <span class="item-card-tag">${item.type}</span>
+                        ${item.category ? `<span class="item-card-tag">${item.category}</span>` : ''}
                     </div>
                 </div>
             </div>
-            <p style="color:var(--text-secondary);margin:1rem 0;line-height:1.6;">
-                ${item.description || 'No description available.'}
-            </p>
-            <div class="detail-stats">
-                <div class="detail-stat">
-                    <span class="detail-stat-label">Value</span>
-                    <span class="detail-stat-value">${item.value != null ? item.value.toLocaleString() : '—'}</span>
+            <p class="detail-desc">${item.description || 'No description available.'}</p>
+            <div class="detail-stats-grid">
+                <div class="detail-stat-card">
+                    <div class="detail-stat-value">${item.value != null ? item.value.toLocaleString() : '—'}</div>
+                    <div class="detail-stat-label">Value</div>
                 </div>
                 ${item.foundIn && item.foundIn.length > 0 ? `
-                <div class="detail-stat">
-                    <span class="detail-stat-label">Found In</span>
-                    <span class="detail-stat-value">${item.foundIn.join(', ')}</span>
+                <div class="detail-stat-card" style="grid-column:span 2">
+                    <div class="detail-stat-value" style="font-size:1rem">${item.foundIn.join(', ')}</div>
+                    <div class="detail-stat-label">Found In</div>
                 </div>
                 ` : ''}
             </div>
@@ -201,7 +208,7 @@
     const enemyGrid = $('#enemyGrid');
     const noEnemyResults = $('#noEnemyResults');
     const enemyModal = $('#enemyModal');
-    const enemyModalClose = $('#enemyModalClose');
+    const closeEnemyModalBtn = $('#closeEnemyModalBtn');
     const modalEnemyDetails = $('#modalEnemyDetails');
 
     if (enemySearch) {
@@ -219,7 +226,7 @@
     }
 
     function openEnemyModal(enemyId) {
-        const enemy = DATA.enemies.find(e => e.id === enemyId);
+        const enemy = (DATA.enemies || []).find(e => e.id === enemyId);
         if (!enemy || !enemyModal || !modalEnemyDetails) return;
 
         const imgSrc = resolveImg(enemy.image) || resolveImg(enemy.icon);
@@ -227,37 +234,43 @@
         let dropTableHTML = '';
         if (enemy.dropTable && enemy.dropTable.length > 0) {
             const rows = enemy.dropTable.map(drop => `
-                <div class="drop-row">
-                    <div class="drop-row-icon">
-                        ${drop.icon ? `<img src="${resolveImg(drop.icon)}" alt="${drop.name}" width="32" height="32" />` : ''}
-                    </div>
-                    <div class="drop-row-info">
-                        <span class="drop-row-name">${drop.name}</span>
-                        <span class="drop-row-type">${drop.type || ''}</span>
-                    </div>
-                    <div>${rarityBadge(drop.rarity)}</div>
+                <div class="drop-item">
+                    ${drop.icon ? `<img src="${resolveImg(drop.icon)}" alt="${drop.name}" class="drop-item-icon" />` : ''}
+                    <span class="drop-item-name">${drop.name}</span>
+                    ${rarityBadge(drop.rarity)}
                 </div>
             `).join('');
             dropTableHTML = `
-                <div class="section-header" style="margin-top:1.5rem;">
+                <div class="drop-table">
                     <h4>Drop Table</h4>
+                    <div class="drop-list">${rows}</div>
                 </div>
-                <div class="drop-table">${rows}</div>
+            `;
+        }
+
+        let mapsHTML = '';
+        if (enemy.relatedMaps && enemy.relatedMaps.length > 0) {
+            mapsHTML = `
+                <div style="margin-top:1rem">
+                    <h4 style="font-family:'Saira',system-ui,sans-serif;font-weight:700;font-size:.9rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 .5rem">Spawn Maps</h4>
+                    <div class="rewards-list">
+                        ${enemy.relatedMaps.map(m => `<span class="reward-chip">${m}</span>`).join('')}
+                    </div>
+                </div>
             `;
         }
 
         modalEnemyDetails.innerHTML = `
             <div class="detail-header">
-                <div class="detail-portrait" style="width:140px;height:140px;">
+                <div class="detail-portrait" style="width:120px;height:120px;">
                     ${imgSrc ? `<img src="${imgSrc}" alt="${enemy.name}" style="max-width:100%;max-height:100%;object-fit:contain;" />` : ''}
                 </div>
                 <div class="detail-info">
-                    <h3>${enemy.name}</h3>
-                    <p style="color:var(--text-secondary);line-height:1.6;margin-top:0.5rem;">
-                        ${enemy.description || 'No description available.'}
-                    </p>
+                    <h3 class="detail-name">${enemy.name}</h3>
+                    <p class="detail-desc">${enemy.description || 'No description available.'}</p>
                 </div>
             </div>
+            ${mapsHTML}
             ${dropTableHTML}
         `;
 
@@ -276,10 +289,10 @@
     // ---------- Quests: Search, Filter & Modal ----------
     const questSearch = $('#questSearch');
     const questList = $('#questList');
-    const traderBtns = $$('#traderFilters .filter-btn');
+    const traderBtns = $$('#traderFilters .cat-filter');
     const noQuestResults = $('#noQuestResults');
     const questModal = $('#questModal');
-    const questModalClose = $('#questModalClose');
+    const closeQuestModalBtn = $('#closeQuestModalBtn');
     const modalQuestDetails = $('#modalQuestDetails');
 
     let activeTrader = 'all';
@@ -318,38 +331,35 @@
     });
 
     function openQuestModal(questId) {
-        const quest = DATA.quests.find(q => q.id === questId);
+        const quest = (DATA.quests || []).find(q => q.id === questId);
         if (!quest || !questModal || !modalQuestDetails) return;
 
         const traderIcon = quest.trader?.icon ? resolveImg(quest.trader.icon) : '';
-        const traderImage = quest.trader?.image ? resolveImg(quest.trader.image) : '';
 
         let stepsHTML = '';
         if (quest.steps && quest.steps.length > 0) {
             const stepsItems = quest.steps.map((step, i) => `
-                <div class="drop-row">
-                    <div class="drop-row-icon" style="background:var(--brand);color:#000;font-weight:700;font-size:0.8rem;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;">
+                <div class="drop-item">
+                    <div style="background:var(--brand);color:#000;font-weight:700;font-size:.75rem;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
                         ${i + 1}
                     </div>
-                    <div class="drop-row-info">
-                        <span class="drop-row-name">${step.title}</span>
-                        ${step.amount ? `<span class="drop-row-type">Amount: ${step.amount}</span>` : ''}
-                    </div>
+                    <span class="drop-item-name">${step.title}</span>
+                    ${step.amount ? `<span class="item-card-tag">x${step.amount}</span>` : ''}
                 </div>
             `).join('');
             stepsHTML = `
-                <div class="section-header" style="margin-top:1.5rem;">
+                <div class="drop-table">
                     <h4>Steps</h4>
+                    <div class="drop-list">${stepsItems}</div>
                 </div>
-                <div class="drop-table">${stepsItems}</div>
             `;
         }
 
         let mapsHTML = '';
         if (quest.maps && quest.maps.length > 0) {
             mapsHTML = `
-                <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
-                    ${quest.maps.map(m => `<span class="reward-chip">${m.name}</span>`).join('')}
+                <div class="rewards-list" style="margin-top:1rem">
+                    ${quest.maps.map(m => `<span class="reward-chip">${m.name || m}</span>`).join('')}
                 </div>
             `;
         }
@@ -360,16 +370,14 @@
                     ${traderIcon ? `<img src="${traderIcon}" alt="${quest.trader.name}" style="width:100%;height:100%;object-fit:cover;" />` : ''}
                 </div>
                 <div class="detail-info">
-                    <h3>${quest.title}</h3>
-                    <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin-top:0.25rem;">
-                        <span class="reward-chip" style="background:var(--brand);color:#000;font-weight:600;">${quest.trader?.name || 'Unknown'}</span>
+                    <h3 class="detail-name">${quest.title}</h3>
+                    <div class="detail-tags">
+                        <span class="rarity-badge epic">${quest.trader?.name || 'Unknown'}</span>
                         ${quest.xpReward ? `<span class="reward-chip">+${quest.xpReward} XP</span>` : ''}
                     </div>
                 </div>
             </div>
-            <p style="color:var(--text-secondary);margin:1rem 0;line-height:1.6;">
-                ${quest.description || 'No description available.'}
-            </p>
+            <p class="detail-desc">${quest.description || 'No description available.'}</p>
             ${mapsHTML}
             ${stepsHTML}
         `;
@@ -397,7 +405,7 @@
         document.body.style.overflow = '';
     }
 
-    [itemModalClose, enemyModalClose, questModalClose].forEach(btn => {
+    [closeItemModalBtn, closeEnemyModalBtn, closeQuestModalBtn].forEach(btn => {
         if (btn) btn.addEventListener('click', closeAllModals);
     });
 
