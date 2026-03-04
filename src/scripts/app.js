@@ -240,12 +240,6 @@
         try { localStorage.setItem('arcraided-source', source); } catch {}
     }
 
-    // Restore saved source preference
-    const savedSource = (() => { try { return localStorage.getItem('arcraided-source'); } catch { return null; } })();
-    if (savedSource === 'metaforge') {
-        switchSource('metaforge');
-    }
-
     sourceBtns.forEach(btn => {
         btn.addEventListener('click', () => switchSource(btn.dataset.source));
     });
@@ -686,4 +680,10 @@
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeAllModals();
     });
+
+    // Restore saved source preference (must be after all const declarations)
+    const savedSource = (() => { try { return localStorage.getItem('arcraided-source'); } catch { return null; } })();
+    if (savedSource === 'metaforge') {
+        switchSource('metaforge');
+    }
 })();
