@@ -1,64 +1,106 @@
 ---
-import { SVG_ICONS } from '@/lib/icons';
-import type { TFTItem } from '@/lib/types';
+import type { ArdbItem } from '@/lib/types';
+import { ITEM_CATEGORIES, ARDB_BASE } from '@/lib/types';
+import { icons } from '@/lib/icons';
 
 interface Props {
-  items: TFTItem[];
+    items: ArdbItem[];
 }
 
 const { items } = Astro.props;
 
-const components = items.filter(i => i.category === 'component');
-const completed = items.filter(i => i.category === 'completed');
-const emblems = items.filter(i => i.category === 'emblem');
-const artifacts = items.filter(i => i.category === 'artifact');
-const radiant = items.filter(i => i.category === 'radiant');
-const support = items.filter(i => i.category === 'support');
-
-const categories = [
-  { key: 'component', label: 'Components', icon: SVG_ICONS.grid, items: components },
-  { key: 'completed', label: 'Completed', icon: SVG_ICONS.sword, items: completed },
-  { key: 'emblem', label: 'Emblems', icon: SVG_ICONS.crown, items: emblems },
-  { key: 'artifact', label: 'Artifacts', icon: SVG_ICONS.gem, items: artifacts },
-  { key: 'radiant', label: 'Radiant', icon: SVG_ICONS.sparkle, items: radiant },
-  { key: 'support', label: 'Support', icon: SVG_ICONS.shield, items: support },
-].filter(c => c.items.length > 0);
-
-const totalShown = categories.reduce((s, c) => s + c.items.length, 0);
+// Group rarities for filter buttons
+const rarities = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 ---
 
-<section id="items" class="content" style="display:none">
+<section class="section hidden" id="items" data-section="items">
     <div class="section-header">
-        <h2>Items</h2>
-        <div class="search-filter">
-            <span class="search-icon"><Fragment set:html={SVG_ICONS.search} /></span>
-            <input type="text" id="itemSearch" placeholder="Search items..." />
-        </div>
+        <h3>Items</h3>
+        <span class="section-count">{items.length} items</span>
     </div>
 
-    <div class="item-category-filters" id="itemCategoryFilters">
-        <button class="item-cat-filter active" data-cat="all" type="button">All <span class="count">{totalShown}</span></button>
-        {categories.map(cat => (
-            <button class="item-cat-filter" data-cat={cat.key} type="button">
-                <Fragment set:html={cat.icon} /> {cat.label} <span class="count">{cat.items.length}</span>
+    <!-- Search -->
+    <div class="search-filter">
+        <span class="search-icon" set:html={icons.search} />
+        <input type="text" id="itemSearch" placeholder="Search items by name or type..." autocomplete="off" />
+    </div>
+
+    <!-- Category Filters -->
+    <div class="category-filters" id="categoryFilters">
+        {ITEM_CATEGORIES.map((cat) => (
+            <button
+                class:list={['filter-btn', { active: cat === 'All' }]}
+                data-category={cat}
+                type="button"
+            >
+                {cat}
             </button>
         ))}
     </div>
 
-    {categories.map(cat => (
-        <div class="item-section" data-item-cat={cat.key}>
-            <h3 class="item-section-title">{cat.label}</h3>
-            <div class="items-grid">
-                {cat.items.map(item => (
-                    <div class={`item-card${cat.key === 'radiant' ? ' item-radiant' : ''}${cat.key === 'artifact' ? ' item-artifact' : ''}`}
-                         data-item-id={item.uniqueId}
-                         data-item-name={item.name.toLowerCase()}
-                         data-item-type={cat.key}>
-                        {item.icon && <img src={item.icon} alt={item.name} loading="lazy" class="item-icon" />}
-                        <span class="item-name">{item.name}</span>
-                    </div>
-                ))}
-            </div>
-        </div>
-    ))}
+    <!-- Rarity Filters -->
+    <div class="category-filters" id="rarityFilters" style="margin-top: 0.25rem;">
+        <button class="filter-btn active" data-rarity="all" type="button">All Rarities</button>
+        {rarities.map((r) => (
+            <button class="filter-btn" data-rarity={r} type="button">
+                <span class="rarity-dot" style={`background: var(--rarity-${r})`}></span>
+                {r.charAt(0).toUpperCase() + r.slice(1)}
+            </button>
+        ))}
+    </div>
+
+    <!-- Item Grid -->
+    <div class="item-grid" id="itemGrid">
+        {items.map((item) => (
+            <button
+                class="item-card"
+                data-rarity={item.rarity ?? 'common'}
+                data-category={item.category}
+                data-type={item.type}
+                data-name={item.name.toLowerCase()}
+                data-id={item.id}
+                type="button"
+            >
+                <div class="item-card-img">
+                    {item.icon ? (
+                        <img
+                            src={`${ARDB_BASE}${item.icon}`}
+                            alt={item.name}
+                            loading="lazy"
+                            width="64"
+                            height="64"
+                        />
+                    ) : (
+                        <span class="item-card-placeholder" set:html={icons.package} />
+                    )}
+                </div>
+                <div class="item-card-body">
+                    <span class="item-card-name">{item.name}</span>
+                    <span class="item-card-type">{item.type}</span>
+                </div>
+            </button>
+        ))}
+    </div>
+
+    <p class="no-results hidden" id="noItemResults">No items match your filters.</p>
 </section>
+
+<style>
+    .rarity-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 2px;
+    }
+    .item-card-placeholder {
+        opacity: 0.3;
+        color: var(--text-secondary);
+    }
+    .no-results {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+</style>

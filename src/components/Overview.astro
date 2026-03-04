@@ -1,121 +1,109 @@
 ---
-import { SVG_ICONS } from '@/lib/icons';
-import type { TFTChampion, TFTTrait, TFTItem } from '@/lib/types';
+import type { ArcRaidedData } from '@/lib/types';
+import { icons } from '@/lib/icons';
 
 interface Props {
-  champions: TFTChampion[];
-  traits: TFTTrait[];
-  items: TFTItem[];
+    data: ArcRaidedData;
 }
 
-const { champions, traits, items } = Astro.props;
+const { data } = Astro.props;
+const { items, enemies, quests, maps, traders, buildInfo } = data;
 
-const costCounts = [1, 2, 3, 4, 5].map(c => champions.filter(ch => ch.cost === c).length);
-const componentItems = items.filter(i => i.category === 'component').length;
-const completedItems = items.filter(i => i.category === 'completed').length;
-
-// Pick random champion portraits for the strip
-const shuffled = [...champions].sort(() => Math.random() - 0.5);
-const stripChamps = shuffled.slice(0, Math.min(20, champions.length));
+// Count items by category
+const weaponCount = items.filter(i => (i.category === 'Weapons')).length;
+const materialCount = items.filter(i => (i.category === 'Materials')).length;
+const consumableCount = items.filter(i => (i.category === 'Consumables')).length;
 ---
 
-<section id="overview" class="content">
+<section class="section" id="overview" data-section="overview">
+    <!-- Splash -->
     <div class="overview-splash">
-        <div class="splash-inner">
-            <h2>Teamfight Tactics <span>Data Hub</span></h2>
-            <p class="splash-sub">Explore champions, items, traits, augments, and leaderboards. All data sourced from Riot's API and Community Dragon.</p>
-
-            <div class="hero-portrait-strip">
-                {stripChamps.map(c => (
-                    <img
-                        src={c.tileIcon || c.icon}
-                        alt={c.name}
-                        loading="lazy"
-                        title={`${c.name} (${c.cost}-cost)`}
-                        class={`cost-border-${c.cost}`}
-                    />
-                ))}
-            </div>
-
-            <div class="search-hero">
-                <div class="search-hero-input-wrap">
-                    <span class="search-icon"><Fragment set:html={SVG_ICONS.search} /></span>
-                    <input type="text" id="ovSearch" placeholder="Search player by Riot ID (Name#TAG)..." />
-                </div>
-                <button type="button" id="ovSearchBtn" class="btn btn-brand">Find Player</button>
-            </div>
-            <p class="search-hint">Requires Riot API key &middot; Enter Riot ID format</p>
+        <div class="overview-splash-top-bar"></div>
+        <div class="overview-splash-content">
+            <h2>ArcRaided</h2>
+            <p>Your complete Arc Raiders data hub. Browse items, enemies, quests, and traders — all in one place.</p>
         </div>
     </div>
 
-    <div class="overview-stats-row">
-        <div class="ov-stat ov-total" data-section="champions">
-            <div class="ov-num">{champions.length}</div>
-            <div class="ov-label"><Fragment set:html={SVG_ICONS.users} /> Champions</div>
+    <!-- Stats Row -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <span class="stat-value">{buildInfo.itemCount}</span>
+            <span class="stat-label">Items</span>
         </div>
-        <div class="ov-stat ov-cost1" data-section="champions">
-            <div class="ov-num">{costCounts[0]}</div>
-            <div class="ov-label">1-Cost</div>
+        <div class="stat-card">
+            <span class="stat-value">{buildInfo.enemyCount}</span>
+            <span class="stat-label">ARC Enemies</span>
         </div>
-        <div class="ov-stat ov-cost3" data-section="champions">
-            <div class="ov-num">{costCounts[2]}</div>
-            <div class="ov-label">3-Cost</div>
+        <div class="stat-card">
+            <span class="stat-value">{buildInfo.questCount}</span>
+            <span class="stat-label">Quests</span>
         </div>
-        <div class="ov-stat ov-cost5" data-section="champions">
-            <div class="ov-num">{costCounts[4]}</div>
-            <div class="ov-label"><Fragment set:html={SVG_ICONS.crown} /> 5-Cost</div>
+        <div class="stat-card">
+            <span class="stat-value">{buildInfo.mapCount}</span>
+            <span class="stat-label">Maps</span>
         </div>
-        <div class="ov-stat ov-traits" data-section="traits">
-            <div class="ov-num">{traits.length}</div>
-            <div class="ov-label"><Fragment set:html={SVG_ICONS.layers} /> Traits</div>
-        </div>
-    </div>
-
-    <div class="ql-grid">
-        <div class="ql-card" data-section="champions">
-            <div class="ql-icon ql-champions"><Fragment set:html={SVG_ICONS.users} /></div>
-            <div>
-                <div class="ql-title">Champion Database</div>
-                <p class="ql-desc">Browse all TFT champions by cost, origin, and class</p>
-            </div>
-        </div>
-        <div class="ql-card" data-section="items">
-            <div class="ql-icon ql-items"><Fragment set:html={SVG_ICONS.sword} /></div>
-            <div>
-                <div class="ql-title">Item Builder</div>
-                <p class="ql-desc">Components, completed items, and their recipes</p>
-            </div>
-        </div>
-        <div class="ql-card" data-section="traits">
-            <div class="ql-icon ql-traits"><Fragment set:html={SVG_ICONS.layers} /></div>
-            <div>
-                <div class="ql-title">Traits & Synergies</div>
-                <p class="ql-desc">Origins, classes, and their breakpoints</p>
-            </div>
+        <div class="stat-card">
+            <span class="stat-value">{buildInfo.traderCount}</span>
+            <span class="stat-label">Traders</span>
         </div>
     </div>
 
-    <div class="ql-grid" style="margin-top:.75rem">
-        <div class="ql-card" data-section="augments">
-            <div class="ql-icon ql-augments"><Fragment set:html={SVG_ICONS.gem} /></div>
-            <div>
-                <div class="ql-title">Augments</div>
-                <p class="ql-desc">Silver, gold, and prismatic augment details</p>
+    <!-- Quick Links -->
+    <div class="quick-links">
+        <button class="quick-link-card" data-goto="items">
+            <div class="quick-link-icon" style="color: var(--rarity-rare);" set:html={icons.package} />
+            <div class="quick-link-info">
+                <strong>Items</strong>
+                <span>{weaponCount} weapons, {materialCount} materials, {consumableCount} consumables & more</span>
             </div>
-        </div>
-        <div class="ql-card" data-section="leaderboard">
-            <div class="ql-icon ql-leaderboard"><Fragment set:html={SVG_ICONS.leaderboard} /></div>
-            <div>
-                <div class="ql-title">Leaderboard</div>
-                <p class="ql-desc">Top Challenger & Grandmaster players</p>
+            <span class="quick-link-arrow" set:html={icons.chevronRight} />
+        </button>
+        <button class="quick-link-card" data-goto="enemies">
+            <div class="quick-link-icon" style="color: var(--rarity-epic);" set:html={icons.crosshair} />
+            <div class="quick-link-info">
+                <strong>ARC Enemies</strong>
+                <span>{enemies.length} enemies with drop tables & spawn maps</span>
             </div>
-        </div>
-        <div class="ql-card" data-section="champions" style="opacity:0.5;pointer-events:none">
-            <div class="ql-icon" style="background:rgba(107,114,128,.1);color:var(--muted)"><Fragment set:html={SVG_ICONS.compass} /></div>
-            <div>
-                <div class="ql-title">Comp Builder</div>
-                <p class="ql-desc">Coming soon — plan your team compositions</p>
+            <span class="quick-link-arrow" set:html={icons.chevronRight} />
+        </button>
+        <button class="quick-link-card" data-goto="quests">
+            <div class="quick-link-icon" style="color: var(--rarity-legendary);" set:html={icons.scroll} />
+            <div class="quick-link-info">
+                <strong>Quests</strong>
+                <span>{quests.length} quests from {traders.length} traders across {maps.length} maps</span>
             </div>
-        </div>
+            <span class="quick-link-arrow" set:html={icons.chevronRight} />
+        </button>
     </div>
+
+    <!-- Map list -->
+    <div class="section-header">
+        <h3>Maps</h3>
+    </div>
+    <div class="stats-row" style="grid-template-columns: repeat(auto-fit, minmax(180px,1fr));">
+        {maps.map(m => (
+            <div class="stat-card">
+                <span class="stat-label" set:html={icons.compass} />
+                <span class="stat-value" style="font-size: 1rem;">{m}</span>
+            </div>
+        ))}
+    </div>
+
+    <!-- Trader list -->
+    <div class="section-header">
+        <h3>Traders</h3>
+    </div>
+    <div class="stats-row" style="grid-template-columns: repeat(auto-fit, minmax(140px,1fr));">
+        {traders.map(t => (
+            <div class="stat-card">
+                <span class="stat-label" set:html={icons.users} />
+                <span class="stat-value" style="font-size: 1rem;">{t}</span>
+            </div>
+        ))}
+    </div>
+
+    <p class="footer-disclaimer" style="text-align: center; margin-top: 2rem;">
+        Last updated: {new Date(buildInfo.generatedAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+    </p>
 </section>

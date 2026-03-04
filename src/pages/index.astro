@@ -1,12 +1,26 @@
 ---
 import Layout from '@/layouts/Layout.astro';
+import Overview from '@/components/Overview.astro';
+import Items from '@/components/Items.astro';
+import Enemies from '@/components/Enemies.astro';
+import Quests from '@/components/Quests.astro';
+import { fetchAllData } from '@/lib/api';
+
+const data = await fetchAllData();
 ---
 
 <Layout>
-  <section class="content" style="padding: 2rem 0;">
-    <div class="card" style="padding: 1.25rem;">
-      <h2 style="margin: 0 0 0.75rem;">ArcRaided setup complete</h2>
-      <p style="margin: 0;">This repo is ready for ARC Raiders development. Start by building out your data layer and pages in <code>src/</code>.</p>
-    </div>
-  </section>
+    <Overview data={data} />
+    <Items items={data.items} />
+    <Enemies enemies={data.enemies} />
+    <Quests quests={data.quests} traders={data.traders} />
 </Layout>
+
+<!-- Hydrate data for client JS -->
+<script is:inline define:vars={{ clientPayload: JSON.stringify({
+    items: data.items.map(i => ({ id: i.id, name: i.name, type: i.type, rarity: i.rarity, category: i.category, description: i.description, value: i.value, icon: i.icon, foundIn: i.foundIn })),
+    enemies: data.enemies.map(e => ({ id: e.id, name: e.name, description: e.description, icon: e.icon, image: e.image, dropTable: e.dropTable, relatedMaps: e.relatedMaps })),
+    quests: data.quests.map(q => ({ id: q.id, title: q.title, description: q.description, trader: q.trader, maps: q.maps, steps: q.steps, requiredItems: q.requiredItems, xpReward: q.xpReward })),
+}) }}>
+    window.__ARCRAIDED_DATA__ = JSON.parse(clientPayload);
+</script>

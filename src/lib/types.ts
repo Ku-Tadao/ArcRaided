@@ -1,141 +1,164 @@
-/* ═══════════════════════════════════════════
-   TFT Types — Scouted
-   ═══════════════════════════════════════════ */
+// ========================
+// Arc Raiders Type Definitions
+// ========================
 
-export interface TFTChampion {
-  name: string;
-  championId: string;
-  cost: 1 | 2 | 3 | 4 | 5;
-  traits: string[];
-  ability: {
+// ---------- ARDB Item ----------
+// Shape: { id, name, description, rarity, type, foundIn[], value, icon?, updatedAt }
+export interface ArdbItem {
+    id: string;
     name: string;
-    desc: string;
-    icon: string;
-    variables: Record<string, number[]>;
-  };
-  stats: {
-    hp: number;
-    mana: number;
-    initialMana: number;
-    armor: number;
-    magicResist: number;
-    damage: number;
-    attackSpeed: number;
-    critChance: number;
-    range: number;
-  };
-  icon: string;
-  tileIcon: string;
-  splashUrl: string;
+    type: string;
+    rarity: string | null;
+    description: string;
+    foundIn: string[];
+    value: number;
+    icon?: string;           // relative path: /items/icons/xxx.webp → prefix with ARDB_BASE
+    updatedAt?: string;
+    /** Attached at runtime */
+    category?: string;
 }
 
-export interface TFTItem {
-  id: number | null;
-  name: string;
-  desc: string;
-  icon: string;
-  category: 'component' | 'completed' | 'emblem' | 'artifact' | 'radiant' | 'support' | 'other';
-  from?: string[];
-  effects: Record<string, number>;
-  uniqueId: string;
-}
-
-export interface TraitDetailRow {
-  style: number;
-  minUnits: number;
-  text: string;
-}
-
-export interface TFTTrait {
-  key: string;
-  name: string;
-  desc: string;
-  descDetails: TraitDetailRow[];
-  icon: string;
-  type: 'origin' | 'class' | 'unique' | 'teamup';
-  style: number;
-  effects: TraitEffect[];
-  champions: { name: string; icon: string; id: string }[];
-}
-
-export interface TraitEffect {
-  minUnits: number;
-  maxUnits: number;
-  style: number;
-  variables: Record<string, number>;
-}
-
-export interface TFTAugment {
-  id: string;
-  name: string;
-  desc: string;
-  icon: string;
-  tier: 1 | 2 | 3;
-  effects: Record<string, number>;
-  associatedTraits?: string[];
-}
-
-export interface TFTLeaderboardEntry {
-  summonerId: string;
-  summonerName: string;
-  leaguePoints: number;
-  rank: string;
-  wins: number;
-  losses: number;
-  puuid: string;
-}
-
-export interface TFTMatchParticipant {
-  puuid: string;
-  placement: number;
-  level: number;
-  goldLeft: number;
-  lastRound: number;
-  timeEliminated: number;
-  totalDamageToPlayers: number;
-  augments: string[];
-  traits: {
+// ---------- ARDB Enemy (list) ----------
+// Shape: { id, name, icon, updatedAt }
+export interface ArdbEnemyListItem {
+    id: string;
     name: string;
-    numUnits: number;
-    style: number;
-    tierCurrent: number;
-    tierTotal: number;
-  }[];
-  units: {
-    characterId: string;
-    itemNames: string[];
-    name: string;
-    rarity: number;
-    tier: number;
-  }[];
-  companion: {
-    contentId: string;
-    skinId: number;
-    species: string;
-  };
+    icon: string;            // relative: /arc/icons/xxx.svg
+    updatedAt?: string;
 }
 
-export interface TFTMatch {
-  matchId: string;
-  gameDatetime: number;
-  gameLength: number;
-  gameVersion: string;
-  queueId: number;
-  setCoreName: string;
-  setNumber: number;
-  participants: TFTMatchParticipant[];
+// ---------- ARDB Enemy (detail) ----------
+// Shape: { id, name, dropTable[], image, icon, relatedMaps[], updatedAt }
+export interface ArdbEnemy extends ArdbEnemyListItem {
+    image?: string;           // relative: /arc/images/xxx.webp
+    dropTable: DropTableEntry[];
+    relatedMaps: string[];
+    description?: string;     // may come from MetaForge merge
+}
+
+export interface DropTableEntry {
+    id: string;
+    name: string;
+    rarity: string | null;
+    type: string;
+    foundIn: string[];
+    value: number;
+    icon?: string;
+    updatedAt?: string;
+}
+
+// ---------- ARDB Quest ----------
+// Shape: { id, maps[], steps[], title, description, trader:{id,name,type,description,image,icon}, requiredItems[], xpReward, updatedAt }
+export interface ArdbQuest {
+    id: string;
+    title: string;
+    description: string;
+    trader: QuestTrader;
+    maps: QuestMap[];
+    steps: QuestStep[];
+    requiredItems: string[];
+    xpReward: number;
+    updatedAt?: string;
+}
+
+export interface QuestTrader {
+    id: string;
+    name: string;
+    type: string;          // 'Security' | etc.
+    description: string;
+    image: string;         // /traders/images/xxx.webp
+    icon: string;          // /traders/icons/xxx.webp
+}
+
+export interface QuestMap {
+    id: string;
+    name: string;
+}
+
+export interface QuestStep {
+    title: string;
+    amount?: number;
+}
+
+// ---------- MetaForge ARC Enemy ----------
+export interface MetaForgeArc {
+    id: string;
+    name: string;
+    description: string;
+    icon: string;         // full CDN URL from Supabase
+    image: string;        // full CDN URL from Supabase
+}
+
+// ---------- Unified App Data ----------
+export interface ArcRaidedData {
+    items: ArdbItem[];
+    enemies: ArdbEnemy[];
+    quests: ArdbQuest[];
+    maps: string[];
+    traders: string[];
+    buildInfo: BuildInfo;
 }
 
 export interface BuildInfo {
-  generatedAt: string;
-  patch: string;
-  set: string;
+    generatedAt: string;
+    itemCount: number;
+    enemyCount: number;
+    questCount: number;
+    mapCount: number;
+    traderCount: number;
 }
 
-export interface ScoutedData {
-  champions: TFTChampion[];
-  items: TFTItem[];
-  traits: TFTTrait[];
-  augments: TFTAugment[];
-  buildInfo: BuildInfo;
+// ---------- Rarity helpers ----------
+export const RARITY_ORDER: Record<string, number> = {
+    common: 0,
+    uncommon: 1,
+    rare: 2,
+    epic: 3,
+    legendary: 4,
+};
+
+export const WEAPON_TYPES = [
+    'hand cannon',
+    'battle rifle',
+    'assault rifle',
+    'SMG',
+    'pistol',
+    'shotgun',
+    'sniper rifle',
+    'LMG',
+] as const;
+
+export const ITEM_CATEGORIES = [
+    'All',
+    'Weapons',
+    'Materials',
+    'Consumables',
+    'Mods',
+    'Blueprints',
+    'Keys',
+    'Gadgets',
+    'Throwables',
+    'Other',
+] as const;
+
+export type WeaponType = typeof WEAPON_TYPES[number];
+export type ItemCategory = typeof ITEM_CATEGORIES[number];
+
+/**
+ * Map raw ARDB item type to a display category
+ */
+export function categorizeItem(type: string): ItemCategory {
+    const t = type.toLowerCase();
+    if (WEAPON_TYPES.includes(t as WeaponType)) return 'Weapons';
+    if (t.includes('material') || t === 'nature') return 'Materials';
+    if (t === 'consumable' || t === 'quick use') return 'Consumables';
+    if (t === 'modification' || t === 'mod') return 'Mods';
+    if (t === 'blueprint') return 'Blueprints';
+    if (t === 'key') return 'Keys';
+    if (t === 'gadget') return 'Gadgets';
+    if (t === 'throwable') return 'Throwables';
+    return 'Other';
 }
+
+/** Image URL prefix for ARDB relative paths */
+export const ARDB_BASE = 'https://ardb.app';
