@@ -16,8 +16,9 @@ npm run build
 
 ## API Keys & Security
 
-- Put secrets in `.env.local` for local development.
-- For production browser access, use the Cloudflare proxy worker template in `cloudflare/multi-api-proxy-worker.js`.
+- API key is stored only in Cloudflare Worker secret `ARC_API_KEY`.
+- Frontend only uses the public proxy URL (`PUBLIC_API_PROXY_URL`).
+- Proxy worker template: `cloudflare/multi-api-proxy-worker.js`.
 - Full setup guide: [docs/API_SETUP.md](docs/API_SETUP.md)
 
 ## Notes
