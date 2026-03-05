@@ -139,6 +139,64 @@ export interface MetaForgeQuestReward {
     };
 }
 
+// ---------- ArcRaiders API Skill ----------
+export interface ArcSkill {
+    id: string;
+    name: string;
+    description: string;
+    icon?: string;
+    tier?: number;
+    category?: string;
+    prerequisites?: string[];
+    effects?: string[];
+    [key: string]: unknown;
+}
+
+// ---------- ArcRaiders API Map ----------
+export interface ArcMap {
+    id: string;
+    name: string;
+    description?: string;
+    image?: string;
+    icon?: string;
+    [key: string]: unknown;
+}
+
+// ---------- ArcRaiders API Trader ----------
+export interface ArcTrader {
+    id: string;
+    name: string;
+    description?: string;
+    type?: string;
+    image?: string;
+    icon?: string;
+    [key: string]: unknown;
+}
+
+// ---------- MetaForge Events ----------
+export interface MetaForgeEvent {
+    id: string;
+    name: string;
+    description?: string;
+    start_time?: string;
+    end_time?: string;
+    type?: string;
+    rewards?: unknown[];
+    image?: string;
+    [key: string]: unknown;
+}
+
+// ---------- MetaForge Trader ----------
+export interface MetaForgeTrader {
+    id: string;
+    name: string;
+    description?: string;
+    icon?: string;
+    image?: string;
+    type?: string;
+    [key: string]: unknown;
+}
+
 // ---------- Data Provider ----------
 export type DataProvider = 'ardb' | 'metaforge';
 
@@ -154,6 +212,11 @@ export interface ArcRaidedData {
         items: MetaForgeItem[];
         quests: MetaForgeQuest[];
     };
+    skills: ArcSkill[];
+    arcMaps: ArcMap[];
+    arcTraders: ArcTrader[];
+    mfTraders: MetaForgeTrader[];
+    events: MetaForgeEvent[];
 }
 
 export interface BuildInfo {
@@ -163,6 +226,8 @@ export interface BuildInfo {
     questCount: number;
     mapCount: number;
     traderCount: number;
+    skillCount: number;
+    eventCount: number;
 }
 
 // ---------- Rarity helpers ----------

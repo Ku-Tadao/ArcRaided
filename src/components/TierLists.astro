@@ -1,0 +1,78 @@
+---
+/**
+ * Tier Lists — user-created tier rankings of items.
+ * Drag/drop items into S/A/B/C/D tiers. Saved to localStorage.
+ */
+import { SVG_ICONS } from '@/lib/icons';
+import type { ArdbItem } from '@/lib/types';
+import { ARDB_BASE } from '@/lib/types';
+
+interface Props {
+    items: ArdbItem[];
+}
+
+const { items } = Astro.props;
+
+const TIERS = [
+    { label: 'S', color: 'var(--rarity-legendary)', bg: 'var(--rarity-legendary-bg)' },
+    { label: 'A', color: 'var(--rarity-epic)', bg: 'var(--rarity-epic-bg)' },
+    { label: 'B', color: 'var(--rarity-rare)', bg: 'var(--rarity-rare-bg)' },
+    { label: 'C', color: 'var(--rarity-uncommon)', bg: 'var(--rarity-uncommon-bg)' },
+    { label: 'D', color: 'var(--rarity-common)', bg: 'var(--rarity-common-bg)' },
+];
+
+// Pre-filter weapons for the default view
+const weapons = items.filter(i => i.category === 'Weapons');
+---
+
+<section id="tier-lists" class="content" style="display:none">
+    <div class="section-header">
+        <h2>Tier Lists</h2>
+        <div style="display:flex;gap:.5rem">
+            <button class="btn btn-ghost btn-sm" id="resetTierListBtn" type="button">Reset</button>
+            <button class="btn btn-brand btn-sm" id="saveTierListBtn" type="button">Save</button>
+        </div>
+    </div>
+
+    <div class="category-filters" id="tierListCatFilters">
+        <button class="cat-filter active" data-tier-cat="Weapons" type="button">Weapons <span class="count">{weapons.length}</span></button>
+        <button class="cat-filter" data-tier-cat="All" type="button">All Items <span class="count">{items.length}</span></button>
+        <button class="cat-filter" data-tier-cat="Gear" type="button">Gear</button>
+        <button class="cat-filter" data-tier-cat="Consumables" type="button">Consumables</button>
+    </div>
+
+    <div class="tier-list-container" id="tierListContainer">
+        {TIERS.map((tier) => (
+            <div class="tier-row" data-tier={tier.label}>
+                <div class="tier-label" style={`background: ${tier.bg}; color: ${tier.color}; border: 1px solid ${tier.color}`}>
+                    {tier.label}
+                </div>
+                <div class="tier-drop-zone" data-tier-zone={tier.label}>
+                    <span class="tier-placeholder">Drag items here</span>
+                </div>
+            </div>
+        ))}
+    </div>
+
+    <div class="tier-unranked" id="tierUnranked">
+        <h4 class="skill-tier-label">Unranked Items</h4>
+        <div class="tier-item-pool" id="tierItemPool">
+            {weapons.map((item) => (
+                <div
+                    class="tier-item"
+                    draggable="true"
+                    data-id={item.id}
+                    data-name={item.name}
+                    data-category={item.category}
+                    title={item.name}
+                >
+                    {item.icon ? (
+                        <img src={`${ARDB_BASE}${item.icon}`} alt={item.name} loading="lazy" />
+                    ) : (
+                        <span style="font-size:.6rem;text-align:center;line-height:1.1">{item.name.slice(0, 8)}</span>
+                    )}
+                </div>
+            ))}
+        </div>
+    </div>
+</section>

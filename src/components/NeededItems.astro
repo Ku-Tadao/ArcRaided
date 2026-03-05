@@ -1,0 +1,76 @@
+---
+/**
+ * Needed Items Tracker — users can check off items they need.
+ * All state is managed client-side with localStorage.
+ */
+import { SVG_ICONS } from '@/lib/icons';
+import type { ArdbItem } from '@/lib/types';
+import { ITEM_CATEGORIES, ARDB_BASE } from '@/lib/types';
+
+interface Props {
+    items: ArdbItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<section id="needed-items" class="content" style="display:none">
+    <div class="section-header">
+        <h2>Needed Items Tracker</h2>
+        <div style="display:flex;gap:.5rem;align-items:center">
+            <div class="search-filter">
+                <span class="search-icon"><Fragment set:html={SVG_ICONS.search} /></span>
+                <input type="text" id="neededSearch" placeholder="Search items to track..." />
+            </div>
+            <button class="btn btn-ghost btn-sm" id="clearNeededBtn" type="button">Clear All</button>
+        </div>
+    </div>
+
+    <div class="needed-info">
+        <div class="needed-summary" id="neededSummary">
+            <span class="needed-count"><strong id="neededCount">0</strong> items tracked</span>
+            <span class="needed-count"><strong id="neededDoneCount">0</strong> found</span>
+            <span class="needed-count"><strong id="neededRemainingCount">0</strong> remaining</span>
+        </div>
+        <div class="needed-progress-bar">
+            <div class="needed-progress-fill" id="neededProgressFill" style="width:0%"></div>
+        </div>
+    </div>
+
+    <div class="category-filters" id="neededViewFilters">
+        <button class="cat-filter active" data-needed-view="all" type="button">All Items</button>
+        <button class="cat-filter" data-needed-view="tracked" type="button">Tracked Only</button>
+        <button class="cat-filter" data-needed-view="remaining" type="button">Still Needed</button>
+    </div>
+
+    <div class="needed-grid" id="neededGrid">
+        {items.map((item) => (
+            <div
+                class="needed-item"
+                data-id={item.id}
+                data-name={item.name.toLowerCase()}
+                data-category={item.category}
+            >
+                <button class="needed-checkbox" type="button" title="Toggle tracking" data-needed-track={item.id}>
+                    <Fragment set:html={SVG_ICONS.checkSquare} />
+                </button>
+                {item.icon ? (
+                    <img src={`${ARDB_BASE}${item.icon}`} alt={item.name} loading="lazy" class="needed-item-icon" />
+                ) : (
+                    <div class="needed-item-icon" style="display:flex;align-items:center;justify-content:center;opacity:0.3">
+                        <Fragment set:html={SVG_ICONS.package} />
+                    </div>
+                )}
+                <div class="needed-item-info">
+                    <span class="needed-item-name">{item.name}</span>
+                    <span class={`rarity-badge ${item.rarity ?? 'common'}`}>{item.rarity ?? 'common'}</span>
+                </div>
+                <button class="needed-found-btn" type="button" title="Mark as found" data-needed-found={item.id}>
+                    Found
+                </button>
+            </div>
+        ))}
+    </div>
+
+    <p class="no-results hidden" id="noNeededResults">No items match your search.</p>
+</section>

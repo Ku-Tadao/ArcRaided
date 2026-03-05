@@ -1,0 +1,95 @@
+---
+/**
+ * Workshop Planner — lets users plan crafting using workbench data from MetaForge items.
+ */
+import { SVG_ICONS } from '@/lib/icons';
+import type { MetaForgeItem } from '@/lib/types';
+
+interface Props {
+    items: MetaForgeItem[];
+}
+
+const { items } = Astro.props;
+
+// Filter items that have workbench data
+const craftable = items.filter(i => i.workbench && typeof i.workbench === 'object');
+const allItems = [...items].sort((a, b) => a.name.localeCompare(b.name));
+---
+
+<section id="workshop" class="content" style="display:none">
+    <div class="section-header">
+        <h2>Workshop Planner</h2>
+        <div class="search-filter">
+            <span class="search-icon"><Fragment set:html={SVG_ICONS.search} /></span>
+            <input type="text" id="workshopSearch" placeholder="Search craftable items..." />
+        </div>
+    </div>
+
+    <p class="muted" style="margin-bottom:1rem">Plan your crafting sessions. Items with workbench data show their crafting requirements.</p>
+
+    {craftable.length === 0 ? (
+        <div>
+            <div class="empty-state" style="margin-bottom:1.5rem">
+                <Fragment set:html={SVG_ICONS.wrench} />
+                <p>No workbench/crafting data available from MetaForge yet. Below are all MetaForge items for reference.</p>
+            </div>
+
+            <div class="items-grid" id="workshopGrid">
+                {allItems.map((item) => (
+                    <div
+                        class={`item-card rarity-${(item.rarity || 'common').toLowerCase()}`}
+                        data-name={item.name.toLowerCase()}
+                        data-id={item.id}
+                    >
+                        {item.icon ? (
+                            <img src={item.icon} alt={item.name} loading="lazy" class="item-card-icon" />
+                        ) : (
+                            <div class="item-card-icon" style="display:flex;align-items:center;justify-content:center;opacity:0.3">
+                                <Fragment set:html={SVG_ICONS.package} />
+                            </div>
+                        )}
+                        <div class="item-card-info">
+                            <div class="item-card-name">{item.name}</div>
+                            <div class="item-card-meta">
+                                <span class={`rarity-badge ${(item.rarity || 'common').toLowerCase()}`}>{item.rarity || 'common'}</span>
+                                <span class="item-card-tag">{item.item_type}</span>
+                            </div>
+                        </div>
+                        {item.value > 0 && <span class="item-value">{item.value.toLocaleString()}</span>}
+                    </div>
+                ))}
+            </div>
+        </div>
+    ) : (
+        <div class="workshop-grid" id="workshopGrid">
+            {craftable.map((item) => (
+                <div class={`workshop-card rarity-${(item.rarity || 'common').toLowerCase()}`} data-id={item.id} data-name={item.name.toLowerCase()}>
+                    <div class="workshop-card-header">
+                        {item.icon ? (
+                            <img src={item.icon} alt={item.name} loading="lazy" class="workshop-icon" />
+                        ) : (
+                            <div class="workshop-icon" style="display:flex;align-items:center;justify-content:center;opacity:0.3">
+                                <Fragment set:html={SVG_ICONS.wrench} />
+                            </div>
+                        )}
+                        <div>
+                            <div class="workshop-item-name">{item.name}</div>
+                            <div class="item-card-meta">
+                                <span class={`rarity-badge ${(item.rarity || 'common').toLowerCase()}`}>{item.rarity}</span>
+                                <span class="item-card-tag">{item.item_type}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="workshop-recipe">
+                        <h4 style="font-family:'Saira',system-ui; font-weight:700; font-size:.8rem; text-transform:uppercase; color:var(--muted); margin:0 0 .4rem">
+                            <Fragment set:html={SVG_ICONS.wrench} /> Workbench Recipe
+                        </h4>
+                        <pre class="workshop-data">{JSON.stringify(item.workbench, null, 2)}</pre>
+                    </div>
+                </div>
+            ))}
+        </div>
+    )}
+
+    <p class="no-results hidden" id="noWorkshopResults">No items match your search.</p>
+</section>

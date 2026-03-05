@@ -1,0 +1,89 @@
+---
+/**
+ * Weekly Trials — displays weekly events/trials from MetaForge events schedule.
+ * Filters events that look like weekly/trial content.
+ */
+import { SVG_ICONS } from '@/lib/icons';
+import type { MetaForgeEvent } from '@/lib/types';
+
+interface Props {
+    events: MetaForgeEvent[];
+}
+
+const { events } = Astro.props;
+
+// Filter for weekly/trial-type events
+const weeklyEvents = events.filter(e => {
+    const name = (e.name ?? '').toLowerCase();
+    const type = ((e.type as string) ?? '').toLowerCase();
+    return name.includes('weekly') || name.includes('trial') || type.includes('weekly') || type.includes('trial');
+});
+
+// If no weekly-specific events, show all events as potential trials
+const displayEvents = weeklyEvents.length > 0 ? weeklyEvents : events;
+
+function formatDate(dateStr: string | undefined): string {
+    if (!dateStr) return '—';
+    try {
+        return new Date(dateStr).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    } catch { return dateStr; }
+}
+
+const now = new Date();
+
+// Precompute status for each event in the frontmatter to avoid < > in template
+interface WeeklyEventDisplay {
+    event: MetaForgeEvent;
+    statusClass: string;
+    statusLabel: string;
+    typeStr: string;
+}
+const processedEvents: WeeklyEventDisplay[] = displayEvents.map(event => {
+    const startMs = event.start_time ? new Date(event.start_time).getTime() : 0;
+    const endMs = event.end_time ? new Date(event.end_time).getTime() : 0;
+    const nowMs = now.getTime();
+    const isActive = startMs !== 0 && (endMs === 0 || nowMs <= endMs) && nowMs >= startMs;
+    const isUpcoming = startMs !== 0 && nowMs < startMs;
+    return {
+        event,
+        statusClass: isActive ? 'active' : isUpcoming ? 'upcoming' : 'ended',
+        statusLabel: isActive ? 'Active' : isUpcoming ? 'Upcoming' : 'Ended',
+        typeStr: (event.type as string) ?? '',
+    };
+});
+---
+
+<section id="weekly-trials" class="content" style="display:none">
+    <div class="section-header">
+        <h2>Weekly Trials</h2>
+    </div>
+
+    {processedEvents.length === 0 ? (
+        <div class="empty-state">
+            <Fragment set:html={SVG_ICONS.calendar} />
+            <p>No weekly trial data available. Check back when the events schedule API has trial data.</p>
+        </div>
+    ) : (
+        <div class="weekly-grid" id="weeklyGrid">
+            {processedEvents.map(({ event, statusClass, statusLabel, typeStr }) => (
+                    <div class={`weekly-card event-${statusClass}`}>
+                        <div class="weekly-card-header">
+                            <span class={`event-status-badge ${statusClass}`}>{statusLabel}</span>
+                            {typeStr && <span class="item-card-tag">{typeStr}</span>}
+                        </div>
+                        {event.image && (
+                            <img src={event.image} alt={event.name} loading="lazy" class="weekly-card-img" />
+                        )}
+                        <div class="weekly-card-body">
+                            <div class="weekly-card-name">{event.name}</div>
+                            {event.description && <p class="weekly-card-desc">{event.description}</p>}
+                            <div class="weekly-card-dates">
+                                {event.start_time && <span><Fragment set:html={SVG_ICONS.clock} /> {formatDate(event.start_time)}</span>}
+                                {event.end_time && <span>→ {formatDate(event.end_time)}</span>}
+                            </div>
+                        </div>
+                    </div>
+            ))}
+        </div>
+    )}
+</section>

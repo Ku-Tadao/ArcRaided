@@ -1,0 +1,83 @@
+---
+/**
+ * Marketplace — shows items with their value and trader prices.
+ * Client-side JS handles sorting, filtering, source toggling.
+ * The component renders the ARDB data; MetaForge items are swapped in via JS.
+ */
+import { SVG_ICONS } from '@/lib/icons';
+import type { ArdbItem } from '@/lib/types';
+import { ARDB_BASE } from '@/lib/types';
+
+interface Props {
+    items: ArdbItem[];
+}
+
+const { items } = Astro.props;
+
+// Pre-sort by value descending
+const sorted = [...items].filter(i => i.value > 0).sort((a, b) => b.value - a.value);
+---
+
+<section id="marketplace" class="content" style="display:none">
+    <div class="section-header">
+        <h2>Marketplace</h2>
+        <div class="search-filter">
+            <span class="search-icon"><Fragment set:html={SVG_ICONS.search} /></span>
+            <input type="text" id="marketSearch" placeholder="Search marketplace..." />
+        </div>
+    </div>
+
+    <div class="category-filters" id="marketSortFilters">
+        <button class="cat-filter active" data-market-sort="value-desc" type="button">Highest Value</button>
+        <button class="cat-filter" data-market-sort="value-asc" type="button">Lowest Value</button>
+        <button class="cat-filter" data-market-sort="name" type="button">Name A-Z</button>
+    </div>
+
+    {sorted.length === 0 ? (
+        <div class="empty-state">
+            <Fragment set:html={SVG_ICONS.store} />
+            <p>No marketplace data available.</p>
+        </div>
+    ) : (
+        <div class="market-table-wrap">
+            <table class="market-table" id="marketTable">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Item</th>
+                        <th>Rarity</th>
+                        <th>Type</th>
+                        <th class="num-col">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {sorted.map((item) => (
+                        <tr
+                            class="market-row"
+                            data-name={item.name.toLowerCase()}
+                            data-rarity={item.rarity ?? 'common'}
+                            data-value={item.value}
+                            data-type={item.type}
+                        >
+                            <td class="market-icon-cell">
+                                {item.icon ? (
+                                    <img src={`${ARDB_BASE}${item.icon}`} alt={item.name} loading="lazy" class="market-icon" />
+                                ) : (
+                                    <div class="market-icon" style="display:flex;align-items:center;justify-content:center;opacity:0.3">
+                                        <Fragment set:html={SVG_ICONS.package} />
+                                    </div>
+                                )}
+                            </td>
+                            <td class="market-name">{item.name}</td>
+                            <td><span class={`rarity-badge ${item.rarity ?? 'common'}`}>{item.rarity ?? 'common'}</span></td>
+                            <td><span class="item-card-tag">{item.type}</span></td>
+                            <td class="market-value">{item.value.toLocaleString()}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    )}
+
+    <p class="no-results hidden" id="noMarketResults">No items match your search.</p>
+</section>

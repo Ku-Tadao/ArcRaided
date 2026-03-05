@@ -1,0 +1,85 @@
+---
+/**
+ * Loot Value Tiers — groups items into value brackets
+ */
+import { SVG_ICONS } from '@/lib/icons';
+import type { ArdbItem } from '@/lib/types';
+import { ARDB_BASE } from '@/lib/types';
+
+interface Props {
+    items: ArdbItem[];
+}
+
+const { items } = Astro.props;
+
+// Define value tiers
+const tiers = [
+    { name: 'S-Tier', label: 'S', min: 10000, color: 'var(--rarity-legendary)', bg: 'var(--rarity-legendary-bg)' },
+    { name: 'A-Tier', label: 'A', min: 5000, color: 'var(--rarity-epic)', bg: 'var(--rarity-epic-bg)' },
+    { name: 'B-Tier', label: 'B', min: 2000, color: 'var(--rarity-rare)', bg: 'var(--rarity-rare-bg)' },
+    { name: 'C-Tier', label: 'C', min: 500, color: 'var(--rarity-uncommon)', bg: 'var(--rarity-uncommon-bg)' },
+    { name: 'D-Tier', label: 'D', min: 0, color: 'var(--rarity-common)', bg: 'var(--rarity-common-bg)' },
+];
+
+const tierGroups = tiers.map(tier => {
+    const nextTier = tiers[tiers.indexOf(tier) - 1];
+    const tierItems = items.filter(i => {
+        const v = i.value ?? 0;
+        if (nextTier) return v >= tier.min && v < nextTier.min;
+        return v >= tier.min;
+    }).sort((a, b) => b.value - a.value);
+    return { ...tier, items: tierItems };
+});
+---
+
+<section id="loot-tiers" class="content" style="display:none">
+    <div class="section-header">
+        <h2>Loot Value Tiers</h2>
+    </div>
+
+    <p class="muted" style="margin-bottom:1.5rem">Items grouped by their sell value. Higher tier = more valuable loot to prioritize.</p>
+
+    <div class="tier-groups" id="tierGroupsContainer">
+        {tierGroups.map((group) => (
+            <div class="tier-group" style={`--tier-color: ${group.color}; --tier-bg: ${group.bg}`}>
+                <div class="tier-header">
+                    <span class="tier-badge" style={`background: ${group.bg}; color: ${group.color}; border: 1px solid ${group.color}`}>
+                        {group.label}
+                    </span>
+                    <span class="tier-name">{group.name}</span>
+                    <span class="tier-range">
+                        {group.min.toLocaleString()}+
+                    </span>
+                    <span class="count">{group.items.length} items</span>
+                </div>
+                {group.items.length > 0 ? (
+                    <div class="tier-items">
+                        {group.items.slice(0, 20).map((item) => (
+                            <div class={`item-card rarity-${item.rarity ?? 'common'}`} data-id={item.id}>
+                                {item.icon ? (
+                                    <img src={`${ARDB_BASE}${item.icon}`} alt={item.name} loading="lazy" class="item-card-icon" />
+                                ) : (
+                                    <div class="item-card-icon" style="display:flex;align-items:center;justify-content:center;opacity:0.3">
+                                        <Fragment set:html={SVG_ICONS.package} />
+                                    </div>
+                                )}
+                                <div class="item-card-info">
+                                    <div class="item-card-name">{item.name}</div>
+                                    <div class="item-card-meta">
+                                        <span class={`rarity-badge ${item.rarity ?? 'common'}`}>{item.rarity ?? 'common'}</span>
+                                    </div>
+                                </div>
+                                <span class="item-value">{item.value.toLocaleString()}</span>
+                            </div>
+                        ))}
+                        {group.items.length > 20 && (
+                            <p class="muted" style="text-align:center;font-size:.8rem;margin:.5rem 0 0">+{group.items.length - 20} more items</p>
+                        )}
+                    </div>
+                ) : (
+                    <p class="muted" style="padding:.75rem;font-size:.85rem">No items in this tier.</p>
+                )}
+            </div>
+        ))}
+    </div>
+</section>

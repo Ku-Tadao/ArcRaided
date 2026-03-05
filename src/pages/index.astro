@@ -4,6 +4,19 @@ import Overview from '@/components/Overview.astro';
 import Items from '@/components/Items.astro';
 import Enemies from '@/components/Enemies.astro';
 import Quests from '@/components/Quests.astro';
+import Traders from '@/components/Traders.astro';
+import Maps from '@/components/Maps.astro';
+import SkillTree from '@/components/SkillTree.astro';
+import EventTimers from '@/components/EventTimers.astro';
+import Guides from '@/components/Guides.astro';
+import Marketplace from '@/components/Marketplace.astro';
+import LootTiers from '@/components/LootTiers.astro';
+import NeededItems from '@/components/NeededItems.astro';
+import BlueprintTracker from '@/components/BlueprintTracker.astro';
+import WorkshopPlanner from '@/components/WorkshopPlanner.astro';
+import Loadouts from '@/components/Loadouts.astro';
+import TierLists from '@/components/TierLists.astro';
+import WeeklyTrials from '@/components/WeeklyTrials.astro';
 import { fetchAllData } from '@/lib/api';
 
 const data = await fetchAllData();
@@ -19,9 +32,12 @@ const clientPayload = JSON.stringify({
     quests: data.quests.map(q => ({ id: q.id, title: q.title, description: q.description, trader: q.trader, maps: q.maps, steps: q.steps, requiredItems: q.requiredItems, xpReward: q.xpReward })),
     buildInfo: data.buildInfo,
     metaforge: {
-        items: data.metaforge.items.map(i => ({ id: i.id, name: i.name, type: i.item_type, rarity: i.rarity, category: i.category, description: i.description, value: i.value, icon: i.icon, stat_block: i.stat_block, trader_price: i.trader_price, ammo_type: i.ammo_type, loadout_slots: i.loadout_slots })),
+        items: data.metaforge.items.map(i => ({ id: i.id, name: i.name, type: i.item_type, rarity: i.rarity, category: i.category, description: i.description, value: i.value, icon: i.icon, stat_block: i.stat_block, trader_price: i.trader_price, ammo_type: i.ammo_type, loadout_slots: i.loadout_slots, shield_type: i.shield_type })),
         quests: data.metaforge.quests.map(q => ({ id: q.id, title: q.name, objectives: q.objectives, xp: q.xp, trader_name: q.trader_name, image: q.image, rewards: q.rewards, guide_links: q.guide_links })),
     },
+    skills: data.skills,
+    arcTraders: data.arcTraders,
+    events: data.events,
 });
 ---
 
@@ -32,6 +48,19 @@ const clientPayload = JSON.stringify({
     <Items items={data.items} />
     <Enemies enemies={data.enemies} />
     <Quests quests={data.quests} traders={data.traders} maps={data.maps} />
+    <Traders arcTraders={data.arcTraders} mfTraders={data.mfTraders} quests={data.quests} />
+    <Maps arcMaps={data.arcMaps} questMaps={data.maps} quests={data.quests} enemies={data.enemies} />
+    <SkillTree skills={data.skills} />
+    <EventTimers events={data.events} />
+    <Guides quests={data.metaforge.quests} />
+    <Marketplace items={data.items} />
+    <LootTiers items={data.items} />
+    <NeededItems items={data.items} />
+    <BlueprintTracker items={data.items} />
+    <WorkshopPlanner items={data.metaforge.items} />
+    <Loadouts items={data.metaforge.items} />
+    <TierLists items={data.items} />
+    <WeeklyTrials events={data.events} />
 
     <script src="../scripts/app.js"></script>
 </Layout>

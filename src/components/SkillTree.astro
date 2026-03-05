@@ -1,0 +1,121 @@
+---
+import { SVG_ICONS } from '@/lib/icons';
+import type { ArcSkill } from '@/lib/types';
+
+interface Props {
+    skills: ArcSkill[];
+}
+
+const { skills } = Astro.props;
+
+// Group skills by category/tier
+const tiers = new Map<number, ArcSkill[]>();
+const categories = new Map<string, ArcSkill[]>();
+
+for (const skill of skills) {
+    const tier = (skill.tier as number) ?? 0;
+    if (!tiers.has(tier)) tiers.set(tier, []);
+    tiers.get(tier)!.push(skill);
+
+    const cat = (skill.category as string) ?? 'General';
+    if (!categories.has(cat)) categories.set(cat, []);
+    categories.get(cat)!.push(skill);
+}
+
+const sortedTiers = [...tiers.entries()].sort((a, b) => a[0] - b[0]);
+const sortedCategories = [...categories.keys()].sort();
+---
+
+<section id="skills" class="content" style="display:none">
+    <div class="section-header">
+        <h2>Skill Tree</h2>
+        <div class="search-filter">
+            <span class="search-icon"><Fragment set:html={SVG_ICONS.search} /></span>
+            <input type="text" id="skillSearch" placeholder="Search skills..." />
+        </div>
+    </div>
+
+    {sortedCategories.length > 1 && (
+        <div class="category-filters" id="skillCategoryFilters">
+            <button class="cat-filter active" data-skill-cat="all" type="button">
+                All <span class="count">{skills.length}</span>
+            </button>
+            {sortedCategories.map(cat => (
+                <button class="cat-filter" data-skill-cat={cat} type="button">
+                    {cat} <span class="count">{categories.get(cat)?.length ?? 0}</span>
+                </button>
+            ))}
+        </div>
+    )}
+
+    {skills.length === 0 ? (
+        <div class="empty-state">
+            <Fragment set:html={SVG_ICONS.zap} />
+            <p>No skill data available yet. The Arc API skills endpoint may not have data populated.</p>
+        </div>
+    ) : (
+        <div class="skills-container" id="skillGrid">
+            {sortedTiers.map(([tier, tierSkills]) => (
+                <div class="skill-tier-group">
+                    <h3 class="skill-tier-label">
+                        <Fragment set:html={SVG_ICONS.layers} />
+                        Tier {tier}
+                        <span class="count">{tierSkills.length}</span>
+                    </h3>
+                    <div class="skills-grid">
+                        {tierSkills.map((skill) => (
+                            <div
+                                class="skill-card"
+                                data-id={skill.id}
+                                data-name={skill.name.toLowerCase()}
+                                data-category={skill.category ?? 'General'}
+                                data-tier={skill.tier ?? 0}
+                            >
+                                <div class="skill-card-icon">
+                                    {skill.icon ? (
+                                        <img src={skill.icon} alt={skill.name} loading="lazy" />
+                                    ) : (
+                                        <Fragment set:html={SVG_ICONS.zap} />
+                                    )}
+                                </div>
+                                <div class="skill-card-info">
+                                    <div class="skill-card-name">{skill.name}</div>
+                                    {skill.category && <div class="skill-card-cat">{skill.category}</div>}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ))}
+
+            {sortedTiers.length === 0 && (
+                <div class="skills-grid">
+                    {skills.map((skill) => (
+                        <div
+                            class="skill-card"
+                            data-id={skill.id}
+                            data-name={skill.name.toLowerCase()}
+                            data-category={skill.category ?? 'General'}
+                        >
+                            <div class="skill-card-icon">
+                                {skill.icon ? (
+                                    <img src={skill.icon} alt={skill.name} loading="lazy" />
+                                ) : (
+                                    <Fragment set:html={SVG_ICONS.zap} />
+                                )}
+                            </div>
+                            <div class="skill-card-info">
+                                <div class="skill-card-name">{skill.name}</div>
+                                {skill.description && (
+                                    <div class="skill-card-desc">{skill.description}</div>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    )}
+
+    <p class="no-results hidden" id="noSkillResults">No skills match your search.</p>
+</section>

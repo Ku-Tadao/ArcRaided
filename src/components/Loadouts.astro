@@ -1,0 +1,98 @@
+---
+/**
+ * Loadouts — lets users build and save loadouts from MetaForge item data.
+ * Uses loadout_slots, ammo_type, shield_type for slot assignment.
+ */
+import { SVG_ICONS } from '@/lib/icons';
+import type { MetaForgeItem } from '@/lib/types';
+
+interface Props {
+    items: MetaForgeItem[];
+}
+
+const { items } = Astro.props;
+
+// Items with loadout slot data
+const slottedItems = items.filter(i => i.loadout_slots && i.loadout_slots.length > 0);
+
+// Group by slot
+const slotGroups = new Map<string, MetaForgeItem[]>();
+for (const item of slottedItems) {
+    for (const slot of item.loadout_slots!) {
+        if (!slotGroups.has(slot)) slotGroups.set(slot, []);
+        slotGroups.get(slot)!.push(item);
+    }
+}
+
+// Fallback categories
+const weapons = items.filter(i => {
+    const t = i.item_type?.toLowerCase() ?? '';
+    return ['hand cannon','battle rifle','assault rifle','smg','pistol','shotgun','sniper rifle','lmg'].includes(t);
+});
+const shields = items.filter(i => i.shield_type);
+const gear = items.filter(i => i.item_type?.toLowerCase() === 'augment' || i.item_type?.toLowerCase() === 'special');
+
+const LOADOUT_SLOTS = slotGroups.size > 0
+    ? [...slotGroups.keys()].sort()
+    : ['Primary Weapon', 'Secondary Weapon', 'Shield', 'Gear'];
+---
+
+<section id="loadouts" class="content" style="display:none">
+    <div class="section-header">
+        <h2>Loadouts</h2>
+        <div style="display:flex;gap:.5rem">
+            <button class="btn btn-brand btn-sm" id="newLoadoutBtn" type="button">
+                <Fragment set:html={SVG_ICONS.sliders} /> New Loadout
+            </button>
+        </div>
+    </div>
+
+    <p class="muted" style="margin-bottom:1rem">Build and save your loadouts. Choose items for each slot and save to localStorage.</p>
+
+    <!-- Loadout Builder -->
+    <div class="loadout-builder" id="loadoutBuilder">
+        <div class="loadout-name-row">
+            <input type="text" id="loadoutName" class="loadout-name-input" placeholder="Loadout name..." value="My Loadout" />
+            <button class="btn btn-brand btn-sm" id="saveLoadoutBtn" type="button">Save</button>
+        </div>
+
+        <div class="loadout-slots" id="loadoutSlots">
+            {LOADOUT_SLOTS.map((slot) => (
+                <div class="loadout-slot" data-slot={slot}>
+                    <div class="loadout-slot-label">{slot}</div>
+                    <div class="loadout-slot-picker" data-slot-name={slot}>
+                        <div class="loadout-slot-empty">
+                            <Fragment set:html={SVG_ICONS.sliders} />
+                            <span>Click to select</span>
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+
+    <!-- Saved Loadouts -->
+    <div class="saved-loadouts" id="savedLoadouts">
+        <h3 class="skill-tier-label">
+            <Fragment set:html={SVG_ICONS.clipboard} /> Saved Loadouts
+        </h3>
+        <div class="saved-loadouts-list" id="savedLoadoutsList">
+            <p class="muted" style="font-size:.85rem">No saved loadouts yet. Build one above and click Save!</p>
+        </div>
+    </div>
+
+    <!-- Item Picker Modal (build via JS) -->
+    <div id="loadoutPickerModal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-content" role="document">
+            <div class="section-header" style="margin-bottom:1rem">
+                <h3 style="margin:0">Choose Item</h3>
+                <div class="search-filter">
+                    <span class="search-icon"><Fragment set:html={SVG_ICONS.search} /></span>
+                    <input type="text" id="loadoutPickerSearch" placeholder="Search items..." />
+                </div>
+            </div>
+            <div class="items-grid" id="loadoutPickerGrid"></div>
+            <button type="button" id="closeLoadoutPicker" class="btn btn-ghost" style="margin-top:1rem">Cancel</button>
+        </div>
+    </div>
+</section>

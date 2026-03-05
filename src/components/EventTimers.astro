@@ -1,0 +1,90 @@
+---
+import { SVG_ICONS } from '@/lib/icons';
+import type { MetaForgeEvent } from '@/lib/types';
+
+interface Props {
+    events: MetaForgeEvent[];
+}
+
+const { events } = Astro.props;
+
+// Sort events by start_time
+const sorted = [...events].sort((a, b) => {
+    const aTime = a.start_time ? new Date(a.start_time).getTime() : 0;
+    const bTime = b.start_time ? new Date(b.start_time).getTime() : 0;
+    return aTime - bTime;
+});
+
+const now = new Date();
+
+function getEventStatus(event: MetaForgeEvent): { label: string; class: string } {
+    if (!event.start_time) return { label: 'Unknown', class: 'unknown' };
+    const start = new Date(event.start_time);
+    const end = event.end_time ? new Date(event.end_time) : null;
+    if (end && now > end) return { label: 'Ended', class: 'ended' };
+    if (now >= start && (!end || now <= end)) return { label: 'Active', class: 'active' };
+    return { label: 'Upcoming', class: 'upcoming' };
+}
+
+function formatDate(dateStr: string | undefined): string {
+    if (!dateStr) return '—';
+    try {
+        return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    } catch { return dateStr; }
+}
+---
+
+<section id="events" class="content" style="display:none">
+    <div class="section-header">
+        <h2>Event Timers</h2>
+    </div>
+
+    {sorted.length === 0 ? (
+        <div class="empty-state">
+            <Fragment set:html={SVG_ICONS.clock} />
+            <p>No event data available. Check back later or the events schedule API may not have current data.</p>
+        </div>
+    ) : (
+        <div class="events-list" id="eventList">
+            {sorted.map((event) => {
+                const status = getEventStatus(event);
+                return (
+                    <div class={`event-card event-${status.class}`} data-id={event.id}>
+                        <div class="event-card-status">
+                            <span class={`event-status-badge ${status.class}`}>{status.label}</span>
+                        </div>
+                        {event.image && (
+                            <div class="event-card-img">
+                                <img src={event.image} alt={event.name} loading="lazy" />
+                            </div>
+                        )}
+                        <div class="event-card-body">
+                            <div class="event-card-name">{event.name}</div>
+                            {event.description && <p class="event-card-desc">{event.description}</p>}
+                            <div class="event-card-times">
+                                {event.start_time && (
+                                    <span class="event-time"><Fragment set:html={SVG_ICONS.clock} /> Start: {formatDate(event.start_time)}</span>
+                                )}
+                                {event.end_time && (
+                                    <span class="event-time"><Fragment set:html={SVG_ICONS.clock} /> End: {formatDate(event.end_time)}</span>
+                                )}
+                            </div>
+                            {status.class === 'active' && event.end_time && (
+                                <div class="event-countdown" data-end={event.end_time}>
+                                    <span class="countdown-label">Ends in:</span>
+                                    <span class="countdown-timer" data-end-time={event.end_time}>calculating...</span>
+                                </div>
+                            )}
+                            {status.class === 'upcoming' && event.start_time && (
+                                <div class="event-countdown" data-start={event.start_time}>
+                                    <span class="countdown-label">Starts in:</span>
+                                    <span class="countdown-timer" data-start-time={event.start_time}>calculating...</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    )}
+</section>

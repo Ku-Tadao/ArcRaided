@@ -1,0 +1,133 @@
+---
+import { SVG_ICONS } from '@/lib/icons';
+import type { ArcMap, ArdbQuest, ArdbEnemy } from '@/lib/types';
+import { ARDB_BASE } from '@/lib/types';
+
+interface Props {
+    arcMaps: ArcMap[];
+    questMaps: string[];
+    quests: ArdbQuest[];
+    enemies: ArdbEnemy[];
+}
+
+const { arcMaps, questMaps, quests, enemies } = Astro.props;
+
+function resolveImg(path: string | undefined): string {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    return `${ARDB_BASE}${path}`;
+}
+
+// Known map names from your feature list
+const KNOWN_MAPS = ['Dam', 'Spaceport', 'Buried City', 'Blue Gate', 'Stella Montis'];
+
+// Merge map data from all sources
+interface MergedMap {
+    id: string;
+    name: string;
+    description: string;
+    image: string;
+    questCount: number;
+    enemyCount: number;
+}
+
+const mapData = new Map<string, MergedMap>();
+
+// From Arc API
+for (const m of arcMaps) {
+    const questCount = quests.filter(q => q.maps?.some(qm => qm.name === m.name || qm.id === m.id)).length;
+    const enemyCount = enemies.filter(e => e.relatedMaps?.includes(m.name) || e.relatedMaps?.includes(m.id)).length;
+    mapData.set(m.name, {
+        id: m.id,
+        name: m.name,
+        description: (m.description as string) ?? '',
+        image: resolveImg(m.image as string),
+        questCount,
+        enemyCount,
+    });
+}
+
+// From quest data (fallback for maps not in Arc API)
+for (const name of questMaps) {
+    if (!mapData.has(name)) {
+        const questCount = quests.filter(q => q.maps?.some(qm => qm.name === name)).length;
+        const enemyCount = enemies.filter(e => e.relatedMaps?.includes(name)).length;
+        mapData.set(name, {
+            id: name.toLowerCase().replace(/\s+/g, '-'),
+            name,
+            description: '',
+            image: '',
+            questCount,
+            enemyCount,
+        });
+    }
+}
+
+// From known maps (ensure they all show up)
+for (const name of KNOWN_MAPS) {
+    if (!mapData.has(name)) {
+        const questCount = quests.filter(q => q.maps?.some(qm => qm.name === name)).length;
+        const enemyCount = enemies.filter(e => e.relatedMaps?.includes(name)).length;
+        mapData.set(name, {
+            id: name.toLowerCase().replace(/\s+/g, '-'),
+            name,
+            description: '',
+            image: '',
+            questCount,
+            enemyCount,
+        });
+    }
+}
+
+const allMaps = [...mapData.values()].sort((a, b) => a.name.localeCompare(b.name));
+
+const mapColors: Record<string, string> = {
+    'Dam': 'var(--rarity-rare)',
+    'Spaceport': 'var(--rarity-epic)',
+    'Buried City': 'var(--rarity-legendary)',
+    'Blue Gate': 'var(--rarity-uncommon)',
+    'Stella Montis': 'var(--rarity-common)',
+};
+---
+
+<section id="maps" class="content" style="display:none">
+    <div class="section-header">
+        <h2>Maps</h2>
+    </div>
+
+    {allMaps.length === 0 ? (
+        <p class="no-results">No map data available.</p>
+    ) : (
+        <div class="maps-grid" id="mapGrid">
+            {allMaps.map((map) => {
+                const color = mapColors[map.name] ?? 'var(--brand)';
+                return (
+                    <div class="map-card" data-id={map.id} data-name={map.name.toLowerCase()}>
+                        <div class="map-card-visual" style={`border-color: ${color}`}>
+                            {map.image ? (
+                                <img src={map.image} alt={map.name} loading="lazy" />
+                            ) : (
+                                <div class="map-card-placeholder" style={`color: ${color}`}>
+                                    <Fragment set:html={SVG_ICONS.compass} />
+                                    <span>{map.name.charAt(0)}</span>
+                                </div>
+                            )}
+                        </div>
+                        <div class="map-card-body">
+                            <div class="map-card-name">{map.name}</div>
+                            <div class="map-card-stats">
+                                {map.questCount > 0 && (
+                                    <span class="reward-chip"><Fragment set:html={SVG_ICONS.scroll} /> {map.questCount} quests</span>
+                                )}
+                                {map.enemyCount > 0 && (
+                                    <span class="reward-chip"><Fragment set:html={SVG_ICONS.crosshair} /> {map.enemyCount} enemies</span>
+                                )}
+                            </div>
+                            {map.description && <p class="map-card-desc">{map.description}</p>}
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    )}
+</section>

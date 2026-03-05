@@ -1,0 +1,81 @@
+---
+/**
+ * Blueprint Tracker — tracks blueprint collection progress.
+ */
+import { SVG_ICONS } from '@/lib/icons';
+import type { ArdbItem } from '@/lib/types';
+import { ARDB_BASE } from '@/lib/types';
+
+interface Props {
+    items: ArdbItem[];
+}
+
+const { items } = Astro.props;
+
+// Get only blueprints
+const blueprints = items.filter(i => i.category === 'Blueprints' || i.type?.toLowerCase() === 'blueprint');
+const sortedBps = [...blueprints].sort((a, b) => {
+    const rarityOrder: Record<string, number> = { common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4 };
+    return (rarityOrder[b.rarity ?? 'common'] ?? 0) - (rarityOrder[a.rarity ?? 'common'] ?? 0);
+});
+---
+
+<section id="blueprints" class="content" style="display:none">
+    <div class="section-header">
+        <h2>Blueprint Tracker</h2>
+        <div style="display:flex;gap:.5rem;align-items:center">
+            <div class="search-filter">
+                <span class="search-icon"><Fragment set:html={SVG_ICONS.search} /></span>
+                <input type="text" id="bpSearch" placeholder="Search blueprints..." />
+            </div>
+            <button class="btn btn-ghost btn-sm" id="clearBpBtn" type="button">Reset</button>
+        </div>
+    </div>
+
+    <div class="needed-info">
+        <div class="needed-summary" id="bpSummary">
+            <span class="needed-count"><strong id="bpTotal">{sortedBps.length}</strong> blueprints</span>
+            <span class="needed-count"><strong id="bpCollected">0</strong> collected</span>
+            <span class="needed-count"><strong id="bpRemaining">{sortedBps.length}</strong> remaining</span>
+        </div>
+        <div class="needed-progress-bar">
+            <div class="needed-progress-fill" id="bpProgressFill" style="width:0%"></div>
+        </div>
+    </div>
+
+    {sortedBps.length === 0 ? (
+        <div class="empty-state">
+            <Fragment set:html={SVG_ICONS.clipboard} />
+            <p>No blueprint data found.</p>
+        </div>
+    ) : (
+        <div class="bp-grid" id="bpGrid">
+            {sortedBps.map((bp) => (
+                <div
+                    class={`bp-card rarity-${bp.rarity ?? 'common'}`}
+                    data-id={bp.id}
+                    data-name={bp.name.toLowerCase()}
+                    data-rarity={bp.rarity ?? 'common'}
+                >
+                    <button class="bp-checkbox" type="button" title="Toggle collected" data-bp-toggle={bp.id}>
+                        <Fragment set:html={SVG_ICONS.checkSquare} />
+                    </button>
+                    {bp.icon ? (
+                        <img src={`${ARDB_BASE}${bp.icon}`} alt={bp.name} loading="lazy" class="bp-icon" />
+                    ) : (
+                        <div class="bp-icon" style="display:flex;align-items:center;justify-content:center;opacity:0.3">
+                            <Fragment set:html={SVG_ICONS.clipboard} />
+                        </div>
+                    )}
+                    <div class="bp-info">
+                        <span class="bp-name">{bp.name}</span>
+                        <span class={`rarity-badge ${bp.rarity ?? 'common'}`}>{bp.rarity ?? 'common'}</span>
+                    </div>
+                    {bp.value > 0 && <span class="item-value">{bp.value.toLocaleString()}</span>}
+                </div>
+            ))}
+        </div>
+    )}
+
+    <p class="no-results hidden" id="noBpResults">No blueprints match your search.</p>
+</section>

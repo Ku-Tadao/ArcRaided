@@ -6,7 +6,12 @@ import type {
     MetaForgeArc,
     MetaForgeItem,
     MetaForgeQuest,
+    MetaForgeTrader,
+    MetaForgeEvent,
     ArcRaidedData,
+    ArcSkill,
+    ArcMap,
+    ArcTrader,
 } from './types';
 import { categorizeItem, ARDB_BASE } from './types';
 
@@ -110,15 +115,60 @@ async function fetchMetaForgeQuests(): Promise<MetaForgeQuest[]> {
     return raw.data || [];
 }
 
+// ---------- Skills (Arc API) ----------
+
+async function fetchSkills(): Promise<ArcSkill[]> {
+    const raw = await safeJSON<any>('/proxy/arc/api/v1/skills?limit=100&offset=0', []);
+    const arr = raw?.data ?? raw;
+    return Array.isArray(arr) ? arr : [];
+}
+
+// ---------- Maps (Arc API) ----------
+
+async function fetchArcMaps(): Promise<ArcMap[]> {
+    const raw = await safeJSON<any>('/proxy/arc/api/v1/maps', []);
+    const arr = raw?.data ?? raw;
+    return Array.isArray(arr) ? arr : [];
+}
+
+// ---------- Traders (Arc API) ----------
+
+async function fetchArcTraders(): Promise<ArcTrader[]> {
+    const raw = await safeJSON<any>('/proxy/arc/api/v1/traders', []);
+    const arr = raw?.data ?? raw;
+    return Array.isArray(arr) ? arr : [];
+}
+
+// ---------- MetaForge Traders ----------
+
+async function fetchMetaForgeTraders(): Promise<MetaForgeTrader[]> {
+    const raw = await safeJSON<any>('/proxy/metaforge/api/arc-raiders/traders', { data: [] });
+    const arr = raw?.data ?? raw;
+    return Array.isArray(arr) ? arr : [];
+}
+
+// ---------- MetaForge Events ----------
+
+async function fetchMetaForgeEvents(): Promise<MetaForgeEvent[]> {
+    const raw = await safeJSON<any>('/proxy/metaforge/api/arc-raiders/events-schedule', { data: [] });
+    const arr = raw?.data ?? raw;
+    return Array.isArray(arr) ? arr : [];
+}
+
 // ---------- Main aggregation ----------
 
 export async function fetchAllData(): Promise<ArcRaidedData> {
-    const [items, enemies, quests, mfItems, mfQuests] = await Promise.all([
+    const [items, enemies, quests, mfItems, mfQuests, skills, arcMaps, arcTraders, mfTraders, events] = await Promise.all([
         fetchItems(),
         fetchEnemies(),
         fetchQuests(),
         fetchMetaForgeItems(),
         fetchMetaForgeQuests(),
+        fetchSkills(),
+        fetchArcMaps(),
+        fetchArcTraders(),
+        fetchMetaForgeTraders(),
+        fetchMetaForgeEvents(),
     ]);
 
     // Extract unique maps
@@ -146,11 +196,18 @@ export async function fetchAllData(): Promise<ArcRaidedData> {
             questCount: quests.length,
             mapCount: maps.length,
             traderCount: traders.length,
+            skillCount: skills.length,
+            eventCount: events.length,
         },
         metaforge: {
             items: mfItems,
             quests: mfQuests,
         },
+        skills,
+        arcMaps,
+        arcTraders,
+        mfTraders,
+        events,
     };
 }
 
