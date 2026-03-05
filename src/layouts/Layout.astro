@@ -170,6 +170,21 @@ const {
         </div>
     </div>
 
+    <!-- Item Picker Modal (for Loadouts & Workshop) -->
+    <div id="loadoutPickerModal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-content" role="document">
+            <div class="section-header" style="margin-bottom:1rem">
+                <h3 style="margin:0">Choose Item</h3>
+                <div class="search-filter">
+                    <span class="search-icon"><Fragment set:html={SVG_ICONS.search} /></span>
+                    <input type="text" id="loadoutPickerSearch" placeholder="Search items..." />
+                </div>
+            </div>
+            <div class="items-grid" id="loadoutPickerGrid"></div>
+            <button type="button" id="closeLoadoutPicker" class="btn btn-ghost" style="margin-top:1rem">Cancel</button>
+        </div>
+    </div>
+
     <footer>
         <div class="container">
             <p>ArcRaided &middot; Built {buildDate} &middot; Data: <a href="https://ardb.app" target="_blank" rel="noopener noreferrer" class="stealth-link">ARDB</a> + <a href="https://metaforge.app/arc-raiders" target="_blank" rel="noopener noreferrer" class="stealth-link">MetaForge</a></p>

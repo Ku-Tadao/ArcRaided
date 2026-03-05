@@ -80,19 +80,4 @@ const LOADOUT_SLOTS = slotGroups.size > 0
             <p class="muted" style="font-size:.85rem">No saved loadouts yet. Build one above and click Save!</p>
         </div>
     </div>
-
-    <!-- Item Picker Modal (build via JS) -->
-    <div id="loadoutPickerModal" class="modal hidden" role="dialog" aria-modal="true">
-        <div class="modal-content" role="document">
-            <div class="section-header" style="margin-bottom:1rem">
-                <h3 style="margin:0">Choose Item</h3>
-                <div class="search-filter">
-                    <span class="search-icon"><Fragment set:html={SVG_ICONS.search} /></span>
-                    <input type="text" id="loadoutPickerSearch" placeholder="Search items..." />
-                </div>
-            </div>
-            <div class="items-grid" id="loadoutPickerGrid"></div>
-            <button type="button" id="closeLoadoutPicker" class="btn btn-ghost" style="margin-top:1rem">Cancel</button>
-        </div>
-    </div>
 </section>

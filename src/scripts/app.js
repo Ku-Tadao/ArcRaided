@@ -294,6 +294,13 @@
         if (noQuestResults) noQuestResults.classList.add('hidden');
     }
 
+    function applySourceNavVisibility(source) {
+        $$('.nav-link[data-source-only], .nav-dd-item[data-source-only]').forEach(el => {
+            const allowed = el.dataset.sourceOnly;
+            el.style.display = (allowed && allowed !== source) ? 'none' : '';
+        });
+    }
+
     function switchSource(source) {
         if (source === activeSource) return;
         activeSource = source;
@@ -302,10 +309,7 @@
         rebuildQuestGrid();
 
         // Show/hide nav items based on data-source-only attribute
-        $$('[data-source-only]').forEach(el => {
-            const allowed = el.dataset.sourceOnly;
-            el.style.display = (allowed && allowed !== source) ? 'none' : '';
-        });
+        applySourceNavVisibility(source);
 
         // If the currently visible section is now hidden, go back to overview
         const visibleSection = sections.find(s => s.style.display !== 'none');
@@ -1505,9 +1509,6 @@
         switchSource('metaforge');
     } else {
         // Apply source-only visibility for default (ardb)
-        $$('[data-source-only]').forEach(el => {
-            const allowed = el.dataset.sourceOnly;
-            el.style.display = (allowed && allowed !== 'ardb') ? 'none' : '';
-        });
+        applySourceNavVisibility('ardb');
     }
 })();
