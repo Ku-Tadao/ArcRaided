@@ -1,4 +1,5 @@
 import type {
+    WeeklyTrial,
     ArdbItem,
     ArdbEnemyListItem,
     ArdbEnemy,

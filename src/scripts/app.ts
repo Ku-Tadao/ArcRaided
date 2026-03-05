@@ -5,32 +5,33 @@
 
 import { getVersionedStore, setVersionedStore } from '../lib/client/storage';
 import { renderItemCard as renderTemplateItemCard } from '../lib/client/templates';
+import type { ArdbItem, MetaForgeItem, ArdbEnemy, MetaForgeArc, ArdbQuest, MetaForgeQuest, ArcSkill, ArcMap, ArcTrader } from "../lib/types";
 
 const ARDB_BASE = 'https://ardb.app/static';
 
     // ---------- Helpers ----------
-    const $ = (sel, ctx = document) => ctx.querySelector(sel);
-    const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
+    const $ = (sel: any, ctx = document) => ctx.querySelector(sel);
+    const $$ = (sel: any, ctx = document) => [...ctx.querySelectorAll(sel)];
 
-    function resolveImg(path) {
+    function resolveImg(path: string | undefined | null) {
         if (!path) return '';
         if (path.startsWith('http')) return path;
         return ARDB_BASE + path;
     }
 
-    function capitalize(s) {
+    function capitalize(s: string | undefined | null) {
         if (!s) return '';
         return s.charAt(0).toUpperCase() + s.slice(1);
     }
 
-    function rarityBadge(rarity) {
+    function rarityBadge(rarity: string | undefined | null) {
         const r = rarity || 'common';
         return `<span class="rarity-badge ${r}">${capitalize(r)}</span>`;
     }
 
     // ---------- Theme ----------
     const themeBtn = $('#themeToggle');
-    function applyTheme(dark) {
+    function applyTheme(dark: boolean) {
         document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
         if (themeBtn) themeBtn.textContent = dark ? 'Light Mode' : 'Dark Mode';
         setVersionedStore('theme', dark ? 'dark' : 'light');
@@ -51,10 +52,10 @@ const ARDB_BASE = 'https://ardb.app/static';
     const navLinks = $$('.nav-link');
     const navDdItems = $$('.nav-dd-item');
     const sections = $$('.content');
-    const allNavItems = [...navLinks.filter(l => l.dataset.section), ...navDdItems];
+    const allNavItems = [...navLinks.filter((l: any) => l.dataset.section), ...navDdItems];
 
-    function showSection(name) {
-        sections.forEach(s => {
+    function showSection(name: string) {
+        sections.forEach((s: any) => {
             const match = s.id === name;
             if (match) {
                 s.style.display = '';
@@ -63,19 +64,19 @@ const ARDB_BASE = 'https://ardb.app/static';
             }
         });
         // Highlight nav: clear all active states
-        navLinks.forEach(l => l.classList.remove('active'));
-        navDdItems.forEach(l => l.classList.remove('active'));
+        navLinks.forEach((l: any) => l.classList.remove('active'));
+        navDdItems.forEach((l: any) => l.classList.remove('active'));
 
         // Activate matching direct nav link OR dropdown item
-        const directMatch = navLinks.filter(l => l.dataset.section === name);
+        const directMatch = navLinks.filter((l: any) => l.dataset.section === name);
         if (directMatch.length > 0) {
-            directMatch.forEach(l => l.classList.add('active'));
+            directMatch.forEach((l: any) => l.classList.add('active'));
         }
-        const ddMatch = navDdItems.filter(l => l.dataset.section === name);
+        const ddMatch = navDdItems.filter((l: any) => l.dataset.section === name);
         if (ddMatch.length > 0) {
-            ddMatch.forEach(l => l.classList.add('active'));
+            ddMatch.forEach((l: any) => l.classList.add('active'));
             // Also highlight the parent dropdown trigger
-            ddMatch.forEach(l => {
+            ddMatch.forEach((l: any) => {
                 const parent = l.closest('.nav-dropdown');
                 if (parent) {
                     const trigger = parent.querySelector('.nav-dropdown-trigger');
@@ -85,30 +86,30 @@ const ARDB_BASE = 'https://ardb.app/static';
         }
 
         // Close all dropdown menus
-        $$('.nav-dropdown-menu').forEach(m => m.classList.add('hidden'));
+        $$('.nav-dropdown-menu').forEach((m: any) => m.classList.add('hidden'));
 
         window.scrollTo({ top: 0, behavior: 'instant' });
     }
 
-    navLinks.forEach(link => {
+    navLinks.forEach((link: any) => {
         if (link.dataset.section) {
             link.addEventListener('click', () => showSection(link.dataset.section));
         }
     });
 
-    navDdItems.forEach(link => {
+    navDdItems.forEach((link: any) => {
         link.addEventListener('click', () => showSection(link.dataset.section));
     });
 
     // Nav dropdown toggle
-    $$('.nav-dropdown-trigger').forEach(trigger => {
-        trigger.addEventListener('click', (e) => {
+    $$('.nav-dropdown-trigger').forEach((trigger: any) => {
+        trigger.addEventListener('click', (e: any) => {
             e.stopPropagation();
             const parent = trigger.closest('.nav-dropdown');
             const menu = parent?.querySelector('.nav-dropdown-menu');
             if (!menu) return;
             // Close other dropdowns
-            $$('.nav-dropdown-menu').forEach(m => {
+            $$('.nav-dropdown-menu').forEach((m: any) => {
                 if (m !== menu) m.classList.add('hidden');
             });
             menu.classList.toggle('hidden');
@@ -116,11 +117,11 @@ const ARDB_BASE = 'https://ardb.app/static';
     });
 
     document.addEventListener('click', () => {
-        $$('.nav-dropdown-menu').forEach(m => m.classList.add('hidden'));
+        $$('.nav-dropdown-menu').forEach((m: any) => m.classList.add('hidden'));
     });
 
     // Quick link navigation (overview stat cards & ql-cards)
-    $$('[data-section]').forEach(el => {
+    $$('[data-section]').forEach((el: any) => {
         if (el.classList.contains('nav-link') || el.classList.contains('nav-dd-item')) return;
         el.addEventListener('click', () => {
             const target = el.dataset.section;
@@ -133,7 +134,7 @@ const ARDB_BASE = 'https://ardb.app/static';
     const switcherDropdown = $('#productSwitcherDropdown');
 
     if (switcherBtn && switcherDropdown) {
-        switcherBtn.addEventListener('click', (e) => {
+        switcherBtn.addEventListener('click', (e: any) => {
             e.stopPropagation();
             switcherDropdown.classList.toggle('hidden');
         });
@@ -144,7 +145,7 @@ const ARDB_BASE = 'https://ardb.app/static';
 
     // ---------- Client Data ----------
     const appDataEl = document.getElementById('app-data');
-    const DATA = appDataEl ? JSON.parse(appDataEl.dataset.payload || '{}') : {};
+    const DATA: { metaforge?: { items?: any[], quests?: any[] }, items?: any[], quests?: any[], enemies?: any[], [key: string]: any } = appDataEl ? JSON.parse(appDataEl.dataset.payload || '{}') : {};
 
     // ---------- Data Source Toggle ----------
     let activeSource = 'ardb';
@@ -161,7 +162,7 @@ const ARDB_BASE = 'https://ardb.app/static';
     // Weapon types for category mapping
     const WEAPON_TYPES = ['hand cannon','battle rifle','assault rifle','smg','pistol','shotgun','sniper rifle','lmg'];
 
-    function categorizeItem(type) {
+    function categorizeItem(type: string | undefined) {
         const t = (type || '').toLowerCase();
         if (t === 'weapon') return 'Weapons';
         if (WEAPON_TYPES.includes(t)) return 'Weapons';
@@ -176,7 +177,7 @@ const ARDB_BASE = 'https://ardb.app/static';
         return 'Other';
     }
 
-    function getWeaponIconSVG(name) {
+    function getWeaponIconSVG(name: string) {
         const n = name.toLowerCase();
         if (['stitcher', 'hairpin', 'kettle', 'burletta', 'bobcat'].includes(n)) return `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h2v12H4zm4 0h2v12H8zm4 0h2v12h-2zm4 0h2v12h-2z"/></svg>`;
         if (['rattler', 'arpeggio', 'venator', 'renegade', 'osprey', 'torrente', 'tempest'].includes(n)) return `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v3H3zm0 5h18v3H3zm0 5h18v3H3z"/></svg>`;
@@ -187,11 +188,11 @@ const ARDB_BASE = 'https://ardb.app/static';
         return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`;
     }
 
-    function renderItemCard(item: any) {
+    function renderItemCard(item: ArdbItem | MetaForgeItem | any) {
         return renderTemplateItemCard(item, activeSource, getWeaponIconSVG);
     }
 
-    function renderQuestCard(quest) {
+    function renderQuestCard(quest: ArdbQuest | MetaForgeQuest | any) {
         if (activeSource === 'metaforge') {
             const img = quest.image || '';
             return `<div class="quest-card" data-id="${quest.id}" data-trader="${quest.trader_name || ''}" data-name="${(quest.title || '').toLowerCase()}" data-maps="" data-source="metaforge">
@@ -210,14 +211,14 @@ const ARDB_BASE = 'https://ardb.app/static';
 
         // ARDB quest
         const traderIcon = quest.trader?.icon ? resolveImg(quest.trader.icon) : '';
-        return `<div class="quest-card" data-id="${quest.id}" data-trader="${quest.trader?.name ?? ''}" data-name="${quest.title.toLowerCase()}" data-maps="${quest.maps?.map(m => m.name).join(',').toLowerCase() ?? ''}" data-source="ardb">
+        return `<div class="quest-card" data-id="${quest.id}" data-trader="${quest.trader?.name ?? ''}" data-name="${quest.title.toLowerCase()}" data-maps="${quest.maps?.map((m: any) => m.name).join(',').toLowerCase() ?? ''}" data-source="ardb">
             <div class="quest-card-img" style="border-radius:50%;">
                 ${traderIcon ? `<img src="${traderIcon}" alt="${quest.trader.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;" />` : `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;opacity:0.3"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>`}
             </div>
             <div class="quest-card-body">
                 <div class="quest-card-title">${quest.title}</div>
                 <div class="quest-card-trader">${quest.trader?.name ?? 'Unknown'}</div>
-                ${quest.maps && quest.maps.length > 0 ? `<div class="quest-card-desc">${quest.maps.map(m => m.name).join(', ')}</div>` : ''}
+                ${quest.maps && quest.maps.length > 0 ? `<div class="quest-card-desc">${quest.maps.map((m: any) => m.name).join(', ')}</div>` : ''}
                 <div class="quest-steps">
                     <span class="quest-step">${quest.steps?.length ?? 0} steps${quest.xpReward ? ` · +${quest.xpReward} XP` : ''}</span>
                 </div>
@@ -231,23 +232,23 @@ const ARDB_BASE = 'https://ardb.app/static';
         itemGrid.innerHTML = items.map(renderItemCard).join('');
 
         // Update category counts
-        categoryBtns.forEach(btn => {
+        categoryBtns.forEach((btn: any) => {
             const cat = btn.dataset.category;
             const countEl = btn.querySelector('.count');
             if (countEl) {
-                const count = cat === 'All' ? items.length : items.filter(i => (i.category || categorizeItem(i.type)) === cat).length;
+                const count = cat === 'All' ? items.length : items.filter((i: any) => (i.category || categorizeItem(i.type)) === cat).length;
                 countEl.textContent = count;
             }
         });
 
         // Update weapon type counts (only meaningful for ARDB)
         if (weaponTypeBtns.length) {
-            const weaponItems = items.filter(i => (i.category || categorizeItem(i.type)) === 'Weapons');
-            weaponTypeBtns.forEach(btn => {
+            const weaponItems = items.filter((i: any) => (i.category || categorizeItem(i.type)) === 'Weapons');
+            weaponTypeBtns.forEach((btn: any) => {
                 const wt = btn.dataset.weaponType;
                 const countEl = btn.querySelector('.count');
                 if (countEl) {
-                    const count = wt === 'all' ? weaponItems.length : weaponItems.filter(i => i.type.toLowerCase() === wt).length;
+                    const count = wt === 'all' ? weaponItems.length : weaponItems.filter((i: any) => i.type.toLowerCase() === wt).length;
                     countEl.textContent = count;
                 }
             });
@@ -257,9 +258,9 @@ const ARDB_BASE = 'https://ardb.app/static';
         activeCategory = 'All';
         activeRarity = 'all';
         activeWeaponType = 'all';
-        categoryBtns.forEach(b => b.classList.toggle('active', b.dataset.category === 'All'));
-        rarityBtns.forEach(b => b.classList.toggle('active', b.dataset.rarity === 'all'));
-        weaponTypeBtns.forEach(b => b.classList.toggle('active', b.dataset.weaponType === 'all'));
+        categoryBtns.forEach((b: any) => b.classList.toggle('active', b.dataset.category === 'All'));
+        rarityBtns.forEach((b: any) => b.classList.toggle('active', b.dataset.rarity === 'all'));
+        weaponTypeBtns.forEach((b: any) => b.classList.toggle('active', b.dataset.weaponType === 'all'));
         if (weaponTypeFilters) weaponTypeFilters.classList.add('hidden');
         if (itemSearch) itemSearch.value = '';
         if (noItemResults) noItemResults.classList.add('hidden');
@@ -284,23 +285,23 @@ const ARDB_BASE = 'https://ardb.app/static';
         // Reset
         activeTrader = 'all';
         activeMap = 'all';
-        traderBtns.forEach(b => b.classList.toggle('active', b.dataset.trader === 'all'));
-        mapBtns.forEach(b => b.classList.toggle('active', b.dataset.map === 'all'));
+        traderBtns.forEach((b: any) => b.classList.toggle('active', b.dataset.trader === 'all'));
+        mapBtns.forEach((b: any) => b.classList.toggle('active', b.dataset.map === 'all'));
         if (questSearch) questSearch.value = '';
         if (noQuestResults) noQuestResults.classList.add('hidden');
     }
 
-    function applySourceNavVisibility(source) {
-        $$('.nav-link[data-source-only], .nav-dd-item[data-source-only]').forEach(el => {
+    function applySourceNavVisibility(source: string) {
+        $$('.nav-link[data-source-only], .nav-dd-item[data-source-only]').forEach((el: any) => {
             const allowed = el.dataset.sourceOnly;
             el.style.display = (allowed && allowed !== source) ? 'none' : '';
         });
     }
 
-    function switchSource(source) {
+    function switchSource(source: string) {
         if (source === activeSource) return;
         activeSource = source;
-        sourceBtns.forEach(b => b.classList.toggle('active', b.dataset.source === source));
+        sourceBtns.forEach((b: any) => b.classList.toggle('active', b.dataset.source === source));
         rebuildItemGrid();
         rebuildQuestGrid();
 
@@ -308,7 +309,7 @@ const ARDB_BASE = 'https://ardb.app/static';
         applySourceNavVisibility(source);
 
         // If the currently visible section is now hidden, go back to overview
-        const visibleSection = sections.find(s => s.style.display !== 'none');
+        const visibleSection = sections.find((s: any) => s.style.display !== 'none');
         if (visibleSection && visibleSection.dataset.sourceOnly && visibleSection.dataset.sourceOnly !== source) {
             showSection('overview');
         }
@@ -316,7 +317,7 @@ const ARDB_BASE = 'https://ardb.app/static';
         setVersionedStore('arcraided-source', source);
     }
 
-    sourceBtns.forEach(btn => {
+    sourceBtns.forEach((btn: any) => {
         btn.addEventListener('click', () => switchSource(btn.dataset.source));
     });
 
@@ -339,7 +340,7 @@ const ARDB_BASE = 'https://ardb.app/static';
         const cards = $$('.item-card', itemGrid);
         let visible = 0;
 
-        cards.forEach(card => {
+        cards.forEach((card: any) => {
             const name = card.dataset.name || '';
             const type = card.dataset.type || '';
             const cat = card.dataset.category || '';
@@ -361,9 +362,9 @@ const ARDB_BASE = 'https://ardb.app/static';
 
     if (itemSearch) itemSearch.addEventListener('input', filterItems);
 
-    categoryBtns.forEach(btn => {
+    categoryBtns.forEach((btn: any) => {
         btn.addEventListener('click', () => {
-            categoryBtns.forEach(b => b.classList.remove('active'));
+            categoryBtns.forEach((b: any) => b.classList.remove('active'));
             btn.classList.add('active');
             activeCategory = btn.dataset.category;
 
@@ -374,7 +375,7 @@ const ARDB_BASE = 'https://ardb.app/static';
                 } else {
                     weaponTypeFilters.classList.add('hidden');
                     activeWeaponType = 'all';
-                    weaponTypeBtns.forEach(b => b.classList.toggle('active', b.dataset.weaponType === 'all'));
+                    weaponTypeBtns.forEach((b: any) => b.classList.toggle('active', b.dataset.weaponType === 'all'));
                 }
             }
 
@@ -382,18 +383,18 @@ const ARDB_BASE = 'https://ardb.app/static';
         });
     });
 
-    rarityBtns.forEach(btn => {
+    rarityBtns.forEach((btn: any) => {
         btn.addEventListener('click', () => {
-            rarityBtns.forEach(b => b.classList.remove('active'));
+            rarityBtns.forEach((b: any) => b.classList.remove('active'));
             btn.classList.add('active');
             activeRarity = btn.dataset.rarity;
             filterItems();
         });
     });
 
-    weaponTypeBtns.forEach(btn => {
+    weaponTypeBtns.forEach((btn: any) => {
         btn.addEventListener('click', () => {
-            weaponTypeBtns.forEach(b => b.classList.remove('active'));
+            weaponTypeBtns.forEach((b: any) => b.classList.remove('active'));
             btn.classList.add('active');
             activeWeaponType = btn.dataset.weaponType;
             filterItems();
@@ -405,9 +406,9 @@ const ARDB_BASE = 'https://ardb.app/static';
     const closeItemModalBtn = $('#closeItemModalBtn');
     const modalItemDetails = $('#modalItemDetails');
 
-    function openItemModal(itemId) {
+    function openItemModal(itemId: string) {
         const items = getItems();
-        const item = items.find(i => i.id === itemId);
+        const item = items.find((i: any) => i.id === itemId);
         if (!item || !itemModal || !modalItemDetails) return;
 
         const imgSrc = resolveImg(item.icon);
@@ -417,9 +418,9 @@ const ARDB_BASE = 'https://ardb.app/static';
         let statsHTML = '';
         if (isMetaForge && item.stat_block) {
             const sb = item.stat_block;
-            const interesting = Object.entries(sb).filter(([k, v]) => v && v !== 0 && v !== '' && k !== 'value');
+            const interesting = Object.entries(sb).filter(([k, v]: any) => v && v !== 0 && v !== '' && k !== 'value');
             if (interesting.length > 0) {
-                const statCards = interesting.map(([k, v]) => `
+                const statCards = interesting.map(([k, v]: any) => `
                     <div class="detail-stat-card">
                         <div class="detail-stat-value">${v}</div>
                         <div class="detail-stat-label">${k.replace(/([A-Z])/g, ' $1').trim()}</div>
@@ -477,7 +478,7 @@ const ARDB_BASE = 'https://ardb.app/static';
     }
 
     if (itemGrid) {
-        itemGrid.addEventListener('click', (e) => {
+        itemGrid.addEventListener('click', (e: any) => {
             const card = e.target.closest('.item-card');
             if (card) openItemModal(card.dataset.id);
         });
@@ -496,7 +497,7 @@ const ARDB_BASE = 'https://ardb.app/static';
             const query = enemySearch.value.toLowerCase().trim();
             const cards = $$('.enemy-card', enemyGrid);
             let visible = 0;
-            cards.forEach(card => {
+            cards.forEach((card: any) => {
                 const match = !query || (card.dataset.name || '').includes(query);
                 card.classList.toggle('hidden', !match);
                 if (match) visible++;
@@ -505,15 +506,15 @@ const ARDB_BASE = 'https://ardb.app/static';
         });
     }
 
-    function openEnemyModal(enemyId) {
-        const enemy = (DATA.enemies || []).find(e => e.id === enemyId);
+    function openEnemyModal(enemyId: string) {
+        const enemy = (DATA.enemies || []).find((e: any) => e.id === enemyId);
         if (!enemy || !enemyModal || !modalEnemyDetails) return;
 
         const imgSrc = resolveImg(enemy.image) || resolveImg(enemy.icon);
 
         let dropTableHTML = '';
         if (enemy.dropTable && enemy.dropTable.length > 0) {
-            const rows = enemy.dropTable.map(drop => `
+            const rows = enemy.dropTable.map((drop: any) => `
                 <div class="drop-item rarity-${(drop.rarity || 'common').toLowerCase()}">
                     <div class="drop-item-icon rarity-image-wrap" style="padding:2px;border-radius:6px;width:32px;height:32px;flex-shrink:0;">
                         <div class="rarity-curve"></div>
@@ -537,7 +538,7 @@ const ARDB_BASE = 'https://ardb.app/static';
                 <div style="margin-top:1rem">
                     <h4 style="font-family:'Saira',system-ui,sans-serif;font-weight:700;font-size:.9rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 .5rem">Spawn Maps</h4>
                     <div class="rewards-list">
-                        ${enemy.relatedMaps.map(m => `<span class="reward-chip">${m}</span>`).join('')}
+                        ${enemy.relatedMaps.map((m: any) => `<span class="reward-chip">${m}</span>`).join('')}
                     </div>
                 </div>
             `;
@@ -563,7 +564,7 @@ const ARDB_BASE = 'https://ardb.app/static';
     }
 
     if (enemyGrid) {
-        enemyGrid.addEventListener('click', (e) => {
+        enemyGrid.addEventListener('click', (e: any) => {
             const card = e.target.closest('.enemy-card');
             if (card) openEnemyModal(card.dataset.id);
         });
@@ -588,7 +589,7 @@ const ARDB_BASE = 'https://ardb.app/static';
         const cards = $$('.quest-card', questList);
         let visible = 0;
 
-        cards.forEach(card => {
+        cards.forEach((card: any) => {
             const name = card.dataset.name || '';
             const trader = card.dataset.trader || '';
             const maps = card.dataset.maps || '';
@@ -607,34 +608,34 @@ const ARDB_BASE = 'https://ardb.app/static';
 
     if (questSearch) questSearch.addEventListener('input', filterQuests);
 
-    traderBtns.forEach(btn => {
+    traderBtns.forEach((btn: any) => {
         btn.addEventListener('click', () => {
-            traderBtns.forEach(b => b.classList.remove('active'));
+            traderBtns.forEach((b: any) => b.classList.remove('active'));
             btn.classList.add('active');
             activeTrader = btn.dataset.trader;
             filterQuests();
         });
     });
 
-    mapBtns.forEach(btn => {
+    mapBtns.forEach((btn: any) => {
         btn.addEventListener('click', () => {
-            mapBtns.forEach(b => b.classList.remove('active'));
+            mapBtns.forEach((b: any) => b.classList.remove('active'));
             btn.classList.add('active');
             activeMap = btn.dataset.map;
             filterQuests();
         });
     });
 
-    function openQuestModal(questId) {
+    function openQuestModal(questId: string) {
         const quests = getQuests();
-        const quest = quests.find(q => q.id === questId);
+        const quest = quests.find((q: any) => q.id === questId);
         if (!quest || !questModal || !modalQuestDetails) return;
 
         if (activeSource === 'metaforge') {
             // MetaForge quest modal
             let objectivesHTML = '';
             if (quest.objectives && quest.objectives.length > 0) {
-                const items = quest.objectives.map((obj, i) => `
+                const items = quest.objectives.map((obj: any, i: any) => `
                     <div class="drop-item">
                         <div style="background:var(--brand);color:#000;font-weight:700;font-size:.75rem;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i + 1}</div>
                         <span class="drop-item-name">${obj}</span>
@@ -645,7 +646,7 @@ const ARDB_BASE = 'https://ardb.app/static';
 
             let rewardsHTML = '';
             if (quest.rewards && quest.rewards.length > 0) {
-                const items = quest.rewards.map(r => `
+                const items = quest.rewards.map((r: any) => `
                     <div class="drop-item rarity-${(r.item?.rarity || 'common').toLowerCase()}">
                         <div class="drop-item-icon rarity-image-wrap" style="padding:2px;border-radius:6px;width:32px;height:32px;flex-shrink:0;">
                             <div class="rarity-curve"></div>
@@ -660,7 +661,7 @@ const ARDB_BASE = 'https://ardb.app/static';
 
             let guidesHTML = '';
             if (quest.guide_links && quest.guide_links.length > 0) {
-                guidesHTML = `<div class="rewards-list" style="margin-top:1rem">${quest.guide_links.map(g => `<a href="${g.url}" target="_blank" rel="noopener noreferrer" class="reward-chip" style="text-decoration:none">${g.label}</a>`).join('')}</div>`;
+                guidesHTML = `<div class="rewards-list" style="margin-top:1rem">${quest.guide_links.map((g: any) => `<a href="${g.url}" target="_blank" rel="noopener noreferrer" class="reward-chip" style="text-decoration:none">${g.label}</a>`).join('')}</div>`;
             }
 
             modalQuestDetails.innerHTML = `
@@ -687,7 +688,7 @@ const ARDB_BASE = 'https://ardb.app/static';
 
             let stepsHTML = '';
             if (quest.steps && quest.steps.length > 0) {
-                const stepsItems = quest.steps.map((step, i) => `
+                const stepsItems = quest.steps.map((step: any, i: any) => `
                     <div class="drop-item">
                         <div style="background:var(--brand);color:#000;font-weight:700;font-size:.75rem;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i + 1}</div>
                         <span class="drop-item-name">${step.title}</span>
@@ -699,7 +700,7 @@ const ARDB_BASE = 'https://ardb.app/static';
 
             let mapsHTML = '';
             if (quest.maps && quest.maps.length > 0) {
-                mapsHTML = `<div class="rewards-list" style="margin-top:1rem">${quest.maps.map(m => `<span class="reward-chip">${m.name || m}</span>`).join('')}</div>`;
+                mapsHTML = `<div class="rewards-list" style="margin-top:1rem">${quest.maps.map((m: any) => `<span class="reward-chip">${m.name || m}</span>`).join('')}</div>`;
             }
 
             modalQuestDetails.innerHTML = `
@@ -728,7 +729,7 @@ const ARDB_BASE = 'https://ardb.app/static';
     }
 
     if (questList) {
-        questList.addEventListener('click', (e) => {
+        questList.addEventListener('click', (e: any) => {
             const card = e.target.closest('.quest-card');
             if (card) openQuestModal(card.dataset.id);
         });
@@ -741,7 +742,7 @@ const ARDB_BASE = 'https://ardb.app/static';
     const closeSkillModalBtn = $('#closeSkillModalBtn');
 
     function closeAllModals() {
-        [itemModal, enemyModal, questModal, traderModal, skillModal].forEach(modal => {
+        [itemModal, enemyModal, questModal, traderModal, skillModal].forEach((modal: any) => {
             if (modal) {
                 modal.classList.add('hidden');
                 modal.setAttribute('aria-hidden', 'true');
@@ -753,21 +754,21 @@ const ARDB_BASE = 'https://ardb.app/static';
         document.body.style.overflow = '';
     }
 
-    [closeItemModalBtn, closeEnemyModalBtn, closeQuestModalBtn, closeTraderModalBtn, closeSkillModalBtn].forEach(btn => {
+    [closeItemModalBtn, closeEnemyModalBtn, closeQuestModalBtn, closeTraderModalBtn, closeSkillModalBtn].forEach((btn: any) => {
         if (btn) btn.addEventListener('click', closeAllModals);
     });
 
     // Close on backdrop click
-    [itemModal, enemyModal, questModal, traderModal, skillModal].forEach(modal => {
+    [itemModal, enemyModal, questModal, traderModal, skillModal].forEach((modal: any) => {
         if (modal) {
-            modal.addEventListener('click', (e) => {
+            modal.addEventListener('click', (e: any) => {
                 if (e.target === modal) closeAllModals();
             });
         }
     });
 
     // Escape key
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', (e: any) => {
         if (e.key === 'Escape') closeAllModals();
     });
 
@@ -781,7 +782,7 @@ const ARDB_BASE = 'https://ardb.app/static';
             const query = traderSearch.value.toLowerCase().trim();
             const cards = $$('.trader-card', traderGrid);
             let visible = 0;
-            cards.forEach(card => {
+            cards.forEach((card: any) => {
                 const match = !query || (card.dataset.name || '').includes(query);
                 card.classList.toggle('hidden', !match);
                 if (match) visible++;
@@ -792,12 +793,12 @@ const ARDB_BASE = 'https://ardb.app/static';
 
     // Trader modal
     if (traderGrid) {
-        traderGrid.addEventListener('click', (e) => {
+        traderGrid.addEventListener('click', (e: any) => {
             const card = e.target.closest('.trader-card');
             if (!card || !traderModal) return;
             const traderId = card.dataset.id;
             const arcTraders = DATA.arcTraders || [];
-            const trader = arcTraders.find(t => t.id === traderId);
+            const trader = arcTraders.find((t: any) => t.id === traderId);
             const modalDetails = $('#modalTraderDetails');
             if (!modalDetails) return;
 
@@ -836,7 +837,7 @@ const ARDB_BASE = 'https://ardb.app/static';
         const query = (skillSearch?.value || '').toLowerCase().trim();
         const cards = $$('.skill-card', skillGrid);
         let visible = 0;
-        cards.forEach(card => {
+        cards.forEach((card: any) => {
             const name = card.dataset.name || '';
             const cat = card.dataset.category || '';
             const matchQuery = !query || name.includes(query);
@@ -849,9 +850,9 @@ const ARDB_BASE = 'https://ardb.app/static';
     }
 
     if (skillSearch) skillSearch.addEventListener('input', filterSkills);
-    skillCatBtns.forEach(btn => {
+    skillCatBtns.forEach((btn: any) => {
         btn.addEventListener('click', () => {
-            skillCatBtns.forEach(b => b.classList.remove('active'));
+            skillCatBtns.forEach((b: any) => b.classList.remove('active'));
             btn.classList.add('active');
             activeSkillCat = btn.dataset.skillCat;
             filterSkills();
@@ -860,12 +861,12 @@ const ARDB_BASE = 'https://ardb.app/static';
 
     // Skill modal
     if (skillGrid) {
-        skillGrid.addEventListener('click', (e) => {
+        skillGrid.addEventListener('click', (e: any) => {
             const card = e.target.closest('.skill-card');
             if (!card || !skillModal) return;
             const skillId = card.dataset.id;
             const skills = DATA.skills || [];
-            const skill = skills.find(s => s.id === skillId);
+            const skill = skills.find((s: any) => s.id === skillId);
             const modalDetails = $('#modalSkillDetails');
             if (!modalDetails) return;
 
@@ -888,7 +889,7 @@ const ARDB_BASE = 'https://ardb.app/static';
                 <p class="detail-desc">${desc}</p>
                 ${skill?.effects && skill.effects.length > 0 ? `
                     <div class="drop-table"><h4>Effects</h4><div class="drop-list">
-                        ${skill.effects.map(eff => `<div class="drop-item"><span class="drop-item-name">${eff}</span></div>`).join('')}
+                        ${skill.effects.map((eff: any) => `<div class="drop-item"><span class="drop-item-name">${eff}</span></div>`).join('')}
                     </div></div>
                 ` : ''}
             `;
@@ -908,7 +909,7 @@ const ARDB_BASE = 'https://ardb.app/static';
             const query = guideSearch.value.toLowerCase().trim();
             const cards = $$('.guide-card', guideGrid);
             let visible = 0;
-            cards.forEach(card => {
+            cards.forEach((card: any) => {
                 const match = !query || (card.dataset.name || '').includes(query);
                 card.classList.toggle('hidden', !match);
                 if (match) visible++;
@@ -928,7 +929,7 @@ const ARDB_BASE = 'https://ardb.app/static';
             const query = marketSearch.value.toLowerCase().trim();
             const rows = $$('.market-row', marketTable);
             let visible = 0;
-            rows.forEach(row => {
+            rows.forEach((row: any) => {
                 const match = !query || (row.dataset.name || '').includes(query);
                 row.classList.toggle('hidden', !match);
                 if (match) visible++;
@@ -937,22 +938,22 @@ const ARDB_BASE = 'https://ardb.app/static';
         });
     }
 
-    marketSortBtns.forEach(btn => {
+    marketSortBtns.forEach((btn: any) => {
         btn.addEventListener('click', () => {
-            marketSortBtns.forEach(b => b.classList.remove('active'));
+            marketSortBtns.forEach((b: any) => b.classList.remove('active'));
             btn.classList.add('active');
             const sort = btn.dataset.marketSort;
             if (!marketTable) return;
             const tbody = marketTable.querySelector('tbody');
             if (!tbody) return;
             const rows = $$('.market-row', tbody);
-            rows.sort((a, b) => {
+            rows.sort((a: any, b: any) => {
                 if (sort === 'value-desc') return (parseFloat(b.dataset.value) || 0) - (parseFloat(a.dataset.value) || 0);
                 if (sort === 'value-asc') return (parseFloat(a.dataset.value) || 0) - (parseFloat(b.dataset.value) || 0);
                 if (sort === 'name') return (a.dataset.name || '').localeCompare(b.dataset.name || '');
                 return 0;
             });
-            rows.forEach(r => tbody.appendChild(r));
+            rows.forEach((r: any) => tbody.appendChild(r));
         });
     });
 
@@ -966,10 +967,10 @@ const ARDB_BASE = 'https://ardb.app/static';
     function getFoundState() {
         return getVersionedStore<string[]>(FOUND_KEY, []);
     }
-    function saveNeededState(ids) {
+    function saveNeededState(ids: string[]) {
         setVersionedStore(NEEDED_KEY, ids);
     }
-    function saveFoundState(ids) {
+    function saveFoundState(ids: string[]) {
         setVersionedStore(FOUND_KEY, ids);
     }
 
@@ -982,13 +983,13 @@ const ARDB_BASE = 'https://ardb.app/static';
         const fillEl = $('#neededProgressFill');
 
         if (countEl) countEl.textContent = needed.length;
-        const doneCount = needed.filter(id => found.includes(id)).length;
+        const doneCount = needed.filter((id: any) => found.includes(id)).length;
         if (doneEl) doneEl.textContent = doneCount;
         const remaining = needed.length - doneCount;
         if (remainEl) remainEl.textContent = remaining;
         if (fillEl) fillEl.style.width = needed.length > 0 ? `${(doneCount / needed.length * 100).toFixed(1)}%` : '0%';
 
-        $$('.needed-item').forEach(el => {
+        $$('.needed-item').forEach((el: any) => {
             const id = el.dataset.id;
             const isNeeded = needed.includes(id);
             const isFound = found.includes(id);
@@ -999,7 +1000,7 @@ const ARDB_BASE = 'https://ardb.app/static';
 
     const neededGrid = $('#neededGrid');
     if (neededGrid) {
-        neededGrid.addEventListener('click', (e) => {
+        neededGrid.addEventListener('click', (e: any) => {
             const trackBtn = e.target.closest('[data-needed-track]');
             if (trackBtn) {
                 const id = trackBtn.dataset.neededTrack;
@@ -1049,7 +1050,7 @@ const ARDB_BASE = 'https://ardb.app/static';
         const found = getFoundState();
         const items = $$('.needed-item');
         let visible = 0;
-        items.forEach(el => {
+        items.forEach((el: any) => {
             const name = el.dataset.name || '';
             const id = el.dataset.id || '';
             const isTracked = needed.includes(id);
@@ -1068,9 +1069,9 @@ const ARDB_BASE = 'https://ardb.app/static';
     }
 
     if (neededSearch) neededSearch.addEventListener('input', filterNeeded);
-    neededViewBtns.forEach(btn => {
+    neededViewBtns.forEach((btn: any) => {
         btn.addEventListener('click', () => {
-            neededViewBtns.forEach(b => b.classList.remove('active'));
+            neededViewBtns.forEach((b: any) => b.classList.remove('active'));
             btn.classList.add('active');
             neededView = btn.dataset.neededView;
             filterNeeded();
@@ -1093,7 +1094,7 @@ const ARDB_BASE = 'https://ardb.app/static';
     function getBpState() {
         return getVersionedStore<string[]>(BP_KEY, []);
     }
-    function saveBpState(ids) {
+    function saveBpState(ids: string[]) {
         setVersionedStore(BP_KEY, ids);
     }
 
@@ -1101,9 +1102,9 @@ const ARDB_BASE = 'https://ardb.app/static';
         const collected = getBpState();
         const bpCards = $$('.bp-card');
         const total = bpCards.length;
-        const collectedCount = bpCards.filter(c => collected.includes(c.dataset.id)).length;
+        const collectedCount = bpCards.filter((c: any) => collected.includes(c.dataset.id)).length;
 
-        bpCards.forEach(card => {
+        bpCards.forEach((card: any) => {
             card.classList.toggle('is-collected', collected.includes(card.dataset.id));
         });
 
@@ -1117,7 +1118,7 @@ const ARDB_BASE = 'https://ardb.app/static';
 
     const bpGrid = $('#bpGrid');
     if (bpGrid) {
-        bpGrid.addEventListener('click', (e) => {
+        bpGrid.addEventListener('click', (e: any) => {
             const toggle = e.target.closest('[data-bp-toggle]');
             if (toggle) {
                 const id = toggle.dataset.bpToggle;
@@ -1139,7 +1140,7 @@ const ARDB_BASE = 'https://ardb.app/static';
             const query = bpSearch.value.toLowerCase().trim();
             const cards = $$('.bp-card', bpGrid);
             let visible = 0;
-            cards.forEach(card => {
+            cards.forEach((card: any) => {
                 const match = !query || (card.dataset.name || '').includes(query);
                 card.classList.toggle('hidden', !match);
                 if (match) visible++;
@@ -1166,7 +1167,7 @@ const ARDB_BASE = 'https://ardb.app/static';
             const query = workshopSearch.value.toLowerCase().trim();
             const cards = $$('[data-name]', workshopGrid);
             let visible = 0;
-            cards.forEach(card => {
+            cards.forEach((card: any) => {
                 const match = !query || (card.dataset.name || '').includes(query);
                 card.classList.toggle('hidden', !match);
                 if (match) visible++;
@@ -1181,23 +1182,23 @@ const ARDB_BASE = 'https://ardb.app/static';
     function getLoadouts() {
         return getVersionedStore<any[]>(LOADOUT_KEY, []);
     }
-    function saveLoadouts(loadouts) {
+    function saveLoadouts(loadouts: Record<string, any>) {
         setVersionedStore(LOADOUT_KEY, loadouts);
     }
 
-    let currentLoadout = {};
+    let currentLoadout: Record<string, any> = {};
 
     const loadoutPickerModal = $('#loadoutPickerModal');
     const loadoutPickerGrid = $('#loadoutPickerGrid');
     const loadoutPickerSearch = $('#loadoutPickerSearch');
     const closeLoadoutPicker = $('#closeLoadoutPicker');
-    let pickerSlot = null;
+    let pickerSlot: string | null = null;
 
-    function openLoadoutPicker(slotName) {
+    function openLoadoutPicker(slotName: string) {
         if (!loadoutPickerModal || !loadoutPickerGrid) return;
         pickerSlot = slotName;
         const mfItems = DATA.metaforge?.items || [];
-        loadoutPickerGrid.innerHTML = mfItems.map(item => {
+        loadoutPickerGrid.innerHTML = mfItems.map((item: any) => {
             const r = (item.rarity || 'common').toLowerCase();
             const iconSvg = getWeaponIconSVG(item.name);
             return `
@@ -1219,12 +1220,12 @@ const ARDB_BASE = 'https://ardb.app/static';
     }
 
     if (loadoutPickerGrid) {
-        loadoutPickerGrid.addEventListener('click', (e) => {
+        loadoutPickerGrid.addEventListener('click', (e: any) => {
             const card = e.target.closest('.item-card');
             if (!card || !pickerSlot) return;
             const id = card.dataset.id;
             const mfItems = DATA.metaforge?.items || [];
-            const item = mfItems.find(i => i.id === id);
+            const item = mfItems.find((i: any) => i.id === id);
             if (!item) return;
             currentLoadout[pickerSlot] = item;
 
@@ -1263,7 +1264,7 @@ const ARDB_BASE = 'https://ardb.app/static';
         loadoutPickerSearch.addEventListener('input', () => {
             const query = loadoutPickerSearch.value.toLowerCase().trim();
             const cards = $$('.item-card', loadoutPickerGrid);
-            cards.forEach(card => {
+            cards.forEach((card: any) => {
                 const match = !query || (card.dataset.name || '').includes(query);
                 card.classList.toggle('hidden', !match);
             });
@@ -1271,7 +1272,7 @@ const ARDB_BASE = 'https://ardb.app/static';
     }
 
     // Slot picking
-    $$('.loadout-slot-picker').forEach(picker => {
+    $$('.loadout-slot-picker').forEach((picker: any) => {
         picker.addEventListener('click', () => {
             const slot = picker.dataset.slotName;
             if (slot) openLoadoutPicker(slot);
@@ -1300,14 +1301,14 @@ const ARDB_BASE = 'https://ardb.app/static';
             savedLoadoutsList.innerHTML = '<p class="muted" style="font-size:.85rem">No saved loadouts yet. Build one above and click Save!</p>';
             return;
         }
-        savedLoadoutsList.innerHTML = loadouts.map((lo, i) => `
+        savedLoadoutsList.innerHTML = loadouts.map((lo: any, i: any) => `
             <div class="saved-loadout-card">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
                     <strong style="font-family:'Saira',system-ui;text-transform:uppercase;letter-spacing:.03em">${lo.name}</strong>
                     <button class="btn btn-ghost btn-sm" data-delete-loadout="${i}" type="button" style="font-size:.7rem;padding:.2rem .5rem">Delete</button>
                 </div>
                 <div style="display:flex;flex-wrap:wrap;gap:.4rem">
-                    ${Object.entries(lo.slots).map(([slot, item]) => `
+                    ${Object.entries(lo.slots).map(([slot, item]: any) => `
                         <div class="reward-chip">
                             ${item.icon ? `<img src="${item.icon}" style="width:16px;height:16px;border-radius:3px" />` : ''}
                             <span>${slot}: ${item.name}</span>
@@ -1318,7 +1319,7 @@ const ARDB_BASE = 'https://ardb.app/static';
         `).join('');
 
         // Delete handlers
-        $$('[data-delete-loadout]', savedLoadoutsList).forEach(btn => {
+        $$('[data-delete-loadout]', savedLoadoutsList).forEach((btn: any) => {
             btn.addEventListener('click', () => {
                 const idx = parseInt(btn.dataset.deleteLoadout, 10);
                 const loadouts = getLoadouts();
@@ -1337,7 +1338,7 @@ const ARDB_BASE = 'https://ardb.app/static';
         newLoadoutBtn.addEventListener('click', () => {
             currentLoadout = {};
             if (loadoutNameInput) loadoutNameInput.value = 'My Loadout';
-            $$('.loadout-slot-picker').forEach(picker => {
+            $$('.loadout-slot-picker').forEach((picker: any) => {
                 picker.innerHTML = '<div class="loadout-slot-empty"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/></svg><span>Click to select</span></div>';
             });
         });
@@ -1352,15 +1353,15 @@ const ARDB_BASE = 'https://ardb.app/static';
     function getTierState() {
         return getVersionedStore<any>(TIER_KEY, {});
     }
-    function saveTierState(state) {
+    function saveTierState(state: Record<string, string[]>) {
         setVersionedStore(TIER_KEY, state);
     }
 
     // Drag and drop
     if (tierItemPool && tierListContainer) {
-        let draggedItem = null;
+        let draggedItem: HTMLElement | null = null;
 
-        function handleDragStart(e) {
+        function handleDragStart(e: any) {
             draggedItem = e.target.closest('.tier-item');
             if (draggedItem) {
                 e.dataTransfer.effectAllowed = 'move';
@@ -1372,20 +1373,20 @@ const ARDB_BASE = 'https://ardb.app/static';
         function handleDragEnd() {
             if (draggedItem) draggedItem.style.opacity = '1';
             draggedItem = null;
-            $$('.tier-drop-zone').forEach(z => z.classList.remove('drag-over'));
+            $$('.tier-drop-zone').forEach((z: any) => z.classList.remove('drag-over'));
         }
 
         tierItemPool.addEventListener('dragstart', handleDragStart);
         tierItemPool.addEventListener('dragend', handleDragEnd);
 
-        $$('.tier-drop-zone', tierListContainer).forEach(zone => {
-            zone.addEventListener('dragover', (e) => {
+        $$('.tier-drop-zone', tierListContainer).forEach((zone: any) => {
+            zone.addEventListener('dragover', (e: any) => {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
                 zone.classList.add('drag-over');
             });
             zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-            zone.addEventListener('drop', (e) => {
+            zone.addEventListener('drop', (e: any) => {
                 e.preventDefault();
                 zone.classList.remove('drag-over');
                 if (!draggedItem) return;
@@ -1402,11 +1403,11 @@ const ARDB_BASE = 'https://ardb.app/static';
         });
 
         // Allow dragging back to pool
-        tierItemPool.addEventListener('dragover', (e) => {
+        tierItemPool.addEventListener('dragover', (e: any) => {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
         });
-        tierItemPool.addEventListener('drop', (e) => {
+        tierItemPool.addEventListener('drop', (e: any) => {
             e.preventDefault();
             if (draggedItem) {
                 tierItemPool.appendChild(draggedItem);
@@ -1419,10 +1420,10 @@ const ARDB_BASE = 'https://ardb.app/static';
     const saveTierListBtn = $('#saveTierListBtn');
     if (saveTierListBtn) {
         saveTierListBtn.addEventListener('click', () => {
-            const state = {};
-            $$('.tier-drop-zone').forEach(zone => {
+            const state: Record<string, string[]> = {};
+            $$('.tier-drop-zone').forEach((zone: any) => {
                 const tier = zone.dataset.tierZone;
-                state[tier] = $$('.tier-item', zone).map(el => el.dataset.id);
+                state[tier] = $$('.tier-item', zone).map((el: any) => el.dataset.id);
             });
             saveTierState(state);
         });
@@ -1432,10 +1433,10 @@ const ARDB_BASE = 'https://ardb.app/static';
     const resetTierListBtn = $('#resetTierListBtn');
     if (resetTierListBtn && tierItemPool) {
         resetTierListBtn.addEventListener('click', () => {
-            $$('.tier-drop-zone .tier-item').forEach(item => {
+            $$('.tier-drop-zone .tier-item').forEach((item: any) => {
                 tierItemPool.appendChild(item);
             });
-            $$('.tier-drop-zone').forEach(zone => {
+            $$('.tier-drop-zone').forEach((zone: any) => {
                 if (!zone.querySelector('.tier-placeholder')) {
                     const span = document.createElement('span');
                     span.className = 'tier-placeholder';
@@ -1450,12 +1451,12 @@ const ARDB_BASE = 'https://ardb.app/static';
     // Restore tier list state
     if (tierItemPool && tierListContainer) {
         const state = getTierState();
-        Object.entries(state).forEach(([tier, ids]) => {
+        Object.entries(state).forEach(([tier, ids]: any) => {
             const zone = tierListContainer.querySelector(`[data-tier-zone="${tier}"]`);
             if (!zone) return;
             const placeholder = zone.querySelector('.tier-placeholder');
             if (placeholder && ids.length > 0) placeholder.remove();
-            ids.forEach(id => {
+            ids.forEach((id: any) => {
                 const item = tierItemPool.querySelector(`[data-id="${id}"]`) ||
                              tierListContainer.querySelector(`[data-id="${id}"]`);
                 if (item) zone.appendChild(item);
@@ -1464,21 +1465,21 @@ const ARDB_BASE = 'https://ardb.app/static';
     }
 
     // Tier list category filter
-    tierListCatBtns.forEach(btn => {
+    tierListCatBtns.forEach((btn: any) => {
         btn.addEventListener('click', () => {
-            tierListCatBtns.forEach(b => b.classList.remove('active'));
+            tierListCatBtns.forEach((b: any) => b.classList.remove('active'));
             btn.classList.add('active');
             const cat = btn.dataset.tierCat;
             if (!tierItemPool) return;
             const allItems = DATA.items || [];
-            const filtered = cat === 'All' ? allItems : allItems.filter(i => i.category === cat);
+            const filtered = cat === 'All' ? allItems : allItems.filter((i: any) => i.category === cat);
 
             // Clear tiers and rebuild pool
-            $$('.tier-drop-zone').forEach(zone => {
+            $$('.tier-drop-zone').forEach((zone: any) => {
                 zone.innerHTML = '<span class="tier-placeholder">Drag items here</span>';
             });
 
-            tierItemPool.innerHTML = filtered.map(item => `
+            tierItemPool.innerHTML = filtered.map((item: any) => `
                 <div class="tier-item rarity-image-wrap rarity-${(item.rarity || 'common').toLowerCase()}" draggable="true" data-id="${item.id}" data-name="${item.name}" data-category="${item.category}" title="${item.name}">
                     <div class="rarity-curve"></div>
                     ${item.icon ? `<img src="${resolveImg(item.icon)}" alt="${item.name}" loading="lazy" class="item-img" style="width:100%;height:100%;object-fit:contain;padding:2px;z-index:2;" />` : `<span style="font-size:.6rem;text-align:center;line-height:1.1;z-index:2;color:#fff;">${item.name.slice(0, 8)}</span>`}
@@ -1490,7 +1491,7 @@ const ARDB_BASE = 'https://ardb.app/static';
     // ---------- Event Countdown Timers ----------
     function updateCountdowns() {
         const now = Date.now();
-        $$('[data-end-ms]').forEach(el => {
+        $$('[data-end-ms]').forEach((el: any) => {
             const end = parseInt(el.dataset.endMs, 10);
             const diff = end - now;
             if (diff <= 0) { el.textContent = 'Ended'; return; }
@@ -1499,7 +1500,7 @@ const ARDB_BASE = 'https://ardb.app/static';
             const s = Math.floor((diff % 60000) / 1000);
             el.textContent = `${h}h ${m}m ${s}s`;
         });
-        $$('[data-start-ms]').forEach(el => {
+        $$('[data-start-ms]').forEach((el: any) => {
             const start = parseInt(el.dataset.startMs, 10);
             const diff = start - now;
             if (diff <= 0) { el.textContent = 'Started!'; return; }
