@@ -484,6 +484,23 @@ const ARDB_BASE = 'https://ardb.app/static';
         });
     }
 
+    const tierGroupsContainer = $('#tierGroupsContainer');
+    if (tierGroupsContainer) {
+        tierGroupsContainer.addEventListener('click', (e: any) => {
+            const card = e.target.closest('.item-card');
+            if (card) openItemModal(card.dataset.id);
+
+            const moreBtn = e.target.closest('.show-more-tier-btn');
+            if (moreBtn && moreBtn.parentElement) {
+                const hiddenItems = moreBtn.parentElement.querySelectorAll('.item-card[style*="display: none"]');
+                hiddenItems.forEach((el: any) => {
+                    el.style.display = '';
+                });
+                moreBtn.remove();
+            }
+        });
+    }
+
     // ---------- Enemies: Search & Modal ----------
     const enemySearch = $('#enemySearch');
     const enemyGrid = $('#enemyGrid');
