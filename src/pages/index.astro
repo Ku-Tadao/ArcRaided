@@ -37,7 +37,7 @@ const clientPayload = JSON.stringify({
     },
     skills: data.skills,
     arcTraders: data.arcTraders,
-    events: data.events,
+    events: data.events.map(e => ({ name: e.name, map: e.map, icon: e.icon, startTime: e.startTime, endTime: e.endTime })),
 });
 ---
 
@@ -60,7 +60,7 @@ const clientPayload = JSON.stringify({
     <WorkshopPlanner items={data.metaforge.items} />
     <Loadouts items={data.metaforge.items} />
     <TierLists items={data.items} />
-    <WeeklyTrials events={data.events} />
+    <WeeklyTrials trials={data.weeklyTrials} />
 
     <script src="../scripts/app.js"></script>
 </Layout>

@@ -155,10 +155,18 @@ async function fetchMetaForgeEvents(): Promise<MetaForgeEvent[]> {
     return Array.isArray(arr) ? arr : [];
 }
 
+// ---------- MetaForge Weekly Trials ----------
+
+async function fetchWeeklyTrials(): Promise<WeeklyTrial[]> {
+    const raw = await safeJSON<any>('/proxy/metaforge/api/arc-raiders/weekly-trials', { data: [] });
+    const arr = raw?.data ?? raw;
+    return Array.isArray(arr) ? arr : [];
+}
+
 // ---------- Main aggregation ----------
 
 export async function fetchAllData(): Promise<ArcRaidedData> {
-    const [items, enemies, quests, mfItems, mfQuests, skills, arcMaps, arcTraders, mfTraders, events] = await Promise.all([
+    const [items, enemies, quests, mfItems, mfQuests, skills, arcMaps, arcTraders, mfTraders, events, weeklyTrials] = await Promise.all([
         fetchItems(),
         fetchEnemies(),
         fetchQuests(),
@@ -169,6 +177,7 @@ export async function fetchAllData(): Promise<ArcRaidedData> {
         fetchArcTraders(),
         fetchMetaForgeTraders(),
         fetchMetaForgeEvents(),
+        fetchWeeklyTrials(),
     ]);
 
     // Extract unique maps
@@ -208,6 +217,7 @@ export async function fetchAllData(): Promise<ArcRaidedData> {
         arcTraders,
         mfTraders,
         events,
+        weeklyTrials,
     };
 }
 

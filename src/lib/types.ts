@@ -173,16 +173,28 @@ export interface ArcTrader {
     [key: string]: unknown;
 }
 
-// ---------- MetaForge Events ----------
+// ---------- MetaForge Events (events-schedule) ----------
 export interface MetaForgeEvent {
+    name: string;
+    map: string;
+    icon: string;
+    startTime: number;  // epoch ms
+    endTime: number;    // epoch ms
+    [key: string]: unknown;
+}
+
+// ---------- MetaForge Weekly Trials ----------
+export interface WeeklyTrial {
     id: string;
     name: string;
-    description?: string;
-    start_time?: string;
-    end_time?: string;
-    type?: string;
-    rewards?: unknown[];
-    image?: string;
+    image_url: string;
+    guide_link: string | null;
+    video_link: string | null;
+    database_links: { url: string; label: string; icon_url: string }[];
+    is_active: boolean;
+    upcoming: boolean;
+    has_event_header: boolean;
+    sort_order: number;
     [key: string]: unknown;
 }
 
@@ -217,6 +229,7 @@ export interface ArcRaidedData {
     arcTraders: ArcTrader[];
     mfTraders: MetaForgeTrader[];
     events: MetaForgeEvent[];
+    weeklyTrials: WeeklyTrial[];
 }
 
 export interface BuildInfo {

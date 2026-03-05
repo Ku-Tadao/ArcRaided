@@ -1,89 +1,139 @@
 ---
 /**
- * Weekly Trials — displays weekly events/trials from MetaForge events schedule.
- * Filters events that look like weekly/trial content.
+ * Weekly Trials — displays weekly trials from MetaForge weekly-trials endpoint.
  */
 import { SVG_ICONS } from '@/lib/icons';
-import type { MetaForgeEvent } from '@/lib/types';
+import type { WeeklyTrial } from '@/lib/types';
 
 interface Props {
-    events: MetaForgeEvent[];
+    trials: WeeklyTrial[];
 }
 
-const { events } = Astro.props;
+const { trials } = Astro.props;
 
-// Filter for weekly/trial-type events
-const weeklyEvents = events.filter(e => {
-    const name = (e.name ?? '').toLowerCase();
-    const type = ((e.type as string) ?? '').toLowerCase();
-    return name.includes('weekly') || name.includes('trial') || type.includes('weekly') || type.includes('trial');
-});
-
-// If no weekly-specific events, show all events as potential trials
-const displayEvents = weeklyEvents.length > 0 ? weeklyEvents : events;
-
-function formatDate(dateStr: string | undefined): string {
-    if (!dateStr) return '—';
-    try {
-        return new Date(dateStr).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    } catch { return dateStr; }
-}
-
-const now = new Date();
-
-// Precompute status for each event in the frontmatter to avoid < > in template
-interface WeeklyEventDisplay {
-    event: MetaForgeEvent;
-    statusClass: string;
-    statusLabel: string;
-    typeStr: string;
-}
-const processedEvents: WeeklyEventDisplay[] = displayEvents.map(event => {
-    const startMs = event.start_time ? new Date(event.start_time).getTime() : 0;
-    const endMs = event.end_time ? new Date(event.end_time).getTime() : 0;
-    const nowMs = now.getTime();
-    const isActive = startMs !== 0 && (endMs === 0 || nowMs <= endMs) && nowMs >= startMs;
-    const isUpcoming = startMs !== 0 && nowMs < startMs;
-    return {
-        event,
-        statusClass: isActive ? 'active' : isUpcoming ? 'upcoming' : 'ended',
-        statusLabel: isActive ? 'Active' : isUpcoming ? 'Upcoming' : 'Ended',
-        typeStr: (event.type as string) ?? '',
-    };
-});
+const activeTrials = trials.filter(t => t.is_active).sort((a, b) => a.sort_order - b.sort_order);
+const upcomingTrials = trials.filter(t => t.upcoming && !t.is_active).sort((a, b) => a.sort_order - b.sort_order);
+const otherTrials = trials.filter(t => !t.is_active && !t.upcoming).sort((a, b) => a.sort_order - b.sort_order);
 ---
 
 <section id="weekly-trials" class="content" style="display:none">
     <div class="section-header">
         <h2>Weekly Trials</h2>
+        <span class="badge">{activeTrials.length} active · {upcomingTrials.length} upcoming · {trials.length} total</span>
     </div>
 
-    {processedEvents.length === 0 ? (
+    {trials.length === 0 ? (
         <div class="empty-state">
             <Fragment set:html={SVG_ICONS.calendar} />
-            <p>No weekly trial data available. Check back when the events schedule API has trial data.</p>
+            <p>No weekly trial data available.</p>
         </div>
     ) : (
-        <div class="weekly-grid" id="weeklyGrid">
-            {processedEvents.map(({ event, statusClass, statusLabel, typeStr }) => (
-                    <div class={`weekly-card event-${statusClass}`}>
-                        <div class="weekly-card-header">
-                            <span class={`event-status-badge ${statusClass}`}>{statusLabel}</span>
-                            {typeStr && <span class="item-card-tag">{typeStr}</span>}
-                        </div>
-                        {event.image && (
-                            <img src={event.image} alt={event.name} loading="lazy" class="weekly-card-img" />
-                        )}
-                        <div class="weekly-card-body">
-                            <div class="weekly-card-name">{event.name}</div>
-                            {event.description && <p class="weekly-card-desc">{event.description}</p>}
-                            <div class="weekly-card-dates">
-                                {event.start_time && <span><Fragment set:html={SVG_ICONS.clock} /> {formatDate(event.start_time)}</span>}
-                                {event.end_time && <span>→ {formatDate(event.end_time)}</span>}
+        <Fragment>
+            {activeTrials.length > 0 && (
+                <Fragment>
+                    <h3 class="event-section-title active-title">Active Weekly Trials</h3>
+                    <div class="weekly-grid">
+                        {activeTrials.map(trial => (
+                            <div class="weekly-card event-active">
+                                <div class="weekly-card-header">
+                                    <span class="event-status-badge active">Active</span>
+                                </div>
+                                {trial.image_url && (
+                                    <img src={trial.image_url} alt={trial.name} loading="lazy" class="weekly-card-img" />
+                                )}
+                                <div class="weekly-card-body">
+                                    <div class="weekly-card-name">{trial.name}</div>
+                                    {trial.database_links.length > 0 && (
+                                        <div class="weekly-db-links">
+                                            {trial.database_links.map(link => (
+                                                <a href={link.url} target="_blank" rel="noopener" class="weekly-db-link">
+                                                    {link.icon_url && <img src={link.icon_url} alt="" class="weekly-db-icon" />}
+                                                    {link.label}
+                                                </a>
+                                            ))}
+                                        </div>
+                                    )}
+                                    <div class="weekly-card-links">
+                                        {trial.guide_link && (
+                                            <a href={trial.guide_link} target="_blank" rel="noopener" class="guide-link-btn">
+                                                <Fragment set:html={SVG_ICONS.book} /> Guide
+                                            </a>
+                                        )}
+                                        {trial.video_link && (
+                                            <a href={trial.video_link} target="_blank" rel="noopener" class="guide-link-btn">
+                                                ▶ Video
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
-            ))}
-        </div>
+                </Fragment>
+            )}
+
+            {upcomingTrials.length > 0 && (
+                <Fragment>
+                    <h3 class="event-section-title upcoming-title">Next Trials</h3>
+                    <div class="weekly-grid">
+                        {upcomingTrials.map(trial => (
+                            <div class="weekly-card event-upcoming">
+                                <div class="weekly-card-header">
+                                    <span class="event-status-badge upcoming">Next</span>
+                                </div>
+                                {trial.image_url && (
+                                    <img src={trial.image_url} alt={trial.name} loading="lazy" class="weekly-card-img" />
+                                )}
+                                <div class="weekly-card-body">
+                                    <div class="weekly-card-name">{trial.name}</div>
+                                    <div class="weekly-card-links">
+                                        {trial.guide_link && (
+                                            <a href={trial.guide_link} target="_blank" rel="noopener" class="guide-link-btn">
+                                                <Fragment set:html={SVG_ICONS.book} /> Guide
+                                            </a>
+                                        )}
+                                        {trial.video_link && (
+                                            <a href={trial.video_link} target="_blank" rel="noopener" class="guide-link-btn">
+                                                ▶ Video
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </Fragment>
+            )}
+
+            {otherTrials.length > 0 && (
+                <Fragment>
+                    <h3 class="event-section-title ended-title">All Other Trials</h3>
+                    <div class="weekly-grid">
+                        {otherTrials.map(trial => (
+                            <div class="weekly-card">
+                                {trial.image_url && (
+                                    <img src={trial.image_url} alt={trial.name} loading="lazy" class="weekly-card-img" />
+                                )}
+                                <div class="weekly-card-body">
+                                    <div class="weekly-card-name">{trial.name}</div>
+                                    <div class="weekly-card-links">
+                                        {trial.guide_link && (
+                                            <a href={trial.guide_link} target="_blank" rel="noopener" class="guide-link-btn">
+                                                <Fragment set:html={SVG_ICONS.book} /> Guide
+                                            </a>
+                                        )}
+                                        {trial.video_link && (
+                                            <a href={trial.video_link} target="_blank" rel="noopener" class="guide-link-btn">
+                                                ▶ Video
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </Fragment>
+            )}
+        </Fragment>
     )}
 </section>

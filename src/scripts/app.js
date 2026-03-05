@@ -1448,9 +1448,9 @@
 
     // ---------- Event Countdown Timers ----------
     function updateCountdowns() {
-        const now = new Date();
-        $$('[data-end-time]').forEach(el => {
-            const end = new Date(el.dataset.endTime);
+        const now = Date.now();
+        $$('[data-end-ms]').forEach(el => {
+            const end = parseInt(el.dataset.endMs, 10);
             const diff = end - now;
             if (diff <= 0) { el.textContent = 'Ended'; return; }
             const h = Math.floor(diff / 3600000);
@@ -1458,14 +1458,15 @@
             const s = Math.floor((diff % 60000) / 1000);
             el.textContent = `${h}h ${m}m ${s}s`;
         });
-        $$('[data-start-time]').forEach(el => {
-            const start = new Date(el.dataset.startTime);
+        $$('[data-start-ms]').forEach(el => {
+            const start = parseInt(el.dataset.startMs, 10);
             const diff = start - now;
             if (diff <= 0) { el.textContent = 'Started!'; return; }
             const d = Math.floor(diff / 86400000);
             const h = Math.floor((diff % 86400000) / 3600000);
             const m = Math.floor((diff % 3600000) / 60000);
-            el.textContent = d > 0 ? `${d}d ${h}h ${m}m` : `${h}h ${m}m`;
+            const s = Math.floor((diff % 60000) / 1000);
+            el.textContent = d > 0 ? `${d}d ${h}h ${m}m` : `${h}h ${m}m ${s}s`;
         });
     }
     updateCountdowns();
