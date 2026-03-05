@@ -142,6 +142,7 @@ nav {
 .nav-wrap { display:flex; align-items:center; gap:.5rem; overflow:visible; }
 .nav-inner { display:flex; align-items:center; gap:.35rem; padding:.6rem 0; flex:1; min-width:0; flex-wrap:wrap; overflow:visible; }
 .nav-link {
+    display:flex; align-items:center; gap:.4rem;
     border:none; background:transparent; padding:.45rem .85rem; border-radius:10px;
     color:var(--muted); font-weight:700; font-size:.82rem; cursor:pointer;
     transition:all .2s ease; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap;
@@ -690,7 +691,11 @@ footer .footer-disclaimer { font-size:.72rem; opacity:.4; }
 }
 .nav-dd-item:hover { background:var(--surface-strong); color:var(--brand); }
 .nav-dd-item.active { background:var(--brand); color:#fff; }
-.nav-dd-icon { font-size:.9rem; width:20px; text-align:center; flex-shrink:0; }
+.nav-dd-icon { 
+    display:flex; align-items:center; justify-content:center;
+    width:20px; height:20px; flex-shrink:0; 
+}
+.nav-dd-icon svg { width:100%; height:100%; display:block; }
 
 /* ═══ Traders Grid ═══ */
 .traders-grid {
