@@ -19,13 +19,13 @@ Provider format:
 
 | Provider | Proxy Prefix | Upstream | Auth | Notes |
 |---|---|---|---|---|
-| ArcRaiders API | `/proxy/arc` | `https://arcraidersapi.com` | Required (`arc_api_key`, injected by worker) | Has per-endpoint rate limits |
+| Shrouded.gg API | `/proxy/arc` | `https://www.shrouded.gg` | Required (`arc_api_key`, injected by worker) | Has per-endpoint rate limits |
 | MetaForge | `/proxy/metaforge` | `https://metaforge.app` | None documented | Attribution required, commercial restrictions |
 | ARDB | `/proxy/ardb` | `https://ardb.app` | None documented | Attribution required, image paths are relative |
 
-## ArcRaiders API
+## Shrouded.gg API
 
-Upstream base: `https://arcraidersapi.com`
+Upstream base: `https://www.shrouded.gg`
 
 Proxy examples:
 
@@ -40,7 +40,7 @@ Proxy examples:
 - `GET /proxy/arc/api/v1/traders`
 - `GET /proxy/arc/api/v1/traders/:id`
 - `GET /proxy/arc/api/v1/quests`
-- `GET /proxy/arc/api/health`
+- `GET /proxy/arc/api/v1/health`
 
 Auth behavior:
 
@@ -71,6 +71,8 @@ Pagination params:
 
 Upstream base: `https://metaforge.app`
 
+API base path: `https://metaforge.app/api/arc-raiders`
+
 Proxy examples:
 
 - `GET /proxy/metaforge/api/arc-raiders/items`
@@ -81,15 +83,48 @@ Proxy examples:
 - `GET /proxy/metaforge/api/arc-raiders/events-schedule`
 - `GET /proxy/metaforge/api/arc-raiders/traders`
 
+Endpoint summary:
+
+- `items`: item list with filtering/pagination/component relationships
+- `arcs`: ARC activity/mission data with optional loot context
+- `quests`: quest data including required items and rewards
+- `game-map-data`: map payloads for supported maps
+- `event-timers`: deprecated upstream endpoint
+- `events-schedule`: consolidated active/scheduled events
+- `traders`: trader inventories
+
 Usage requirements:
 
 - Public projects must include attribution with link: `https://metaforge.app/arc-raiders`
 - Monetized use requires contacting MetaForge team first
 - Endpoints can change without notice; cache on your side
 
+Operational notes:
+
+- No API key is documented for MetaForge endpoints
+- Large request bursts may be throttled
+- Avoid direct high-frequency polling from clients
+
+Support channel:
+
+- Discord: `https://discord.gg/8UEK9TrQDs`
+
+Error responses (documented):
+
+- `400` Bad Request
+- `404` Not Found
+- `413` Payload Too Large
+- `500` Internal Server Error
+
+Legal note:
+
+- MetaForge states ARC Raiders IP/assets are owned by Embark Studios and the project is fan-made/non-affiliated
+
 ## ARDB API
 
 Upstream base: `https://ardb.app`
+
+API base path: `https://ardb.app/api`
 
 Proxy examples:
 
@@ -100,11 +135,25 @@ Proxy examples:
 - `GET /proxy/ardb/api/arc-enemies`
 - `GET /proxy/ardb/api/arc-enemies/{id}`
 
+Endpoint summary:
+
+- `items`: all items (basic subset including id)
+- `items/{id}`: single item with associated data
+- `quests`: all quests (basic subset including id)
+- `quests/{id}`: single quest with associated data
+- `arc-enemies`: all ARC enemies (basic subset including id)
+- `arc-enemies/{id}`: single ARC enemy with associated data
+
 Usage requirements:
 
 - Include source disclaimer with link to `https://ardb.app`
 - Suggested disclaimer: `Data provided by https://ardb.app`
 - Endpoint shapes may change; store/cached refresh is recommended
+
+Operational notes:
+
+- ARDB asks consumers to store responses in their own storage and refresh periodically
+- Response shapes and endpoint behavior can change over time
 
 Image/icon paths:
 

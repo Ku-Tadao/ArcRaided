@@ -29,7 +29,7 @@ The worker injects `arc_api_key` server-side.
 
 ### Provider routing map
 
-- `arc` → upstream `https://arcraidersapi.com` (requires Worker secret `ARC_API_KEY`)
+- `arc` → upstream `https://www.shrouded.gg` (requires Worker secret `ARC_API_KEY`)
 - `metaforge` → upstream `https://metaforge.app` (no API key)
 - `ardb` → upstream `https://ardb.app` (use `/api/...` path, no API key)
 

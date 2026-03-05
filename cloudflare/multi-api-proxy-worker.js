@@ -6,7 +6,7 @@ const CORS_HEADERS = {
 
 const PROVIDERS = {
   arc: {
-    baseUrl: 'https://arcraidersapi.com',
+    baseUrl: 'https://www.shrouded.gg',
     keyHeader: 'arc_api_key',
     secretName: 'ARC_API_KEY',
     prefix: '/api/v1/',
