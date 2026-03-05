@@ -16,7 +16,7 @@ const upcomingTrials = trials.filter(t => t.upcoming && !t.is_active).sort((a, b
 const otherTrials = trials.filter(t => !t.is_active && !t.upcoming).sort((a, b) => a.sort_order - b.sort_order);
 ---
 
-<section id="weekly-trials" class="content" style="display:none">
+<section id="weekly-trials" class="content" data-source-only="metaforge" style="display:none">
     <div class="section-header">
         <h2>Weekly Trials</h2>
         <span class="badge">{activeTrials.length} active · {upcomingTrials.length} upcoming · {trials.length} total</span>

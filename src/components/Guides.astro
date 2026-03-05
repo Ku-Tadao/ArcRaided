@@ -12,7 +12,7 @@ const { quests } = Astro.props;
 const guidedQuests = quests.filter(q => q.guide_links && q.guide_links.length > 0);
 ---
 
-<section id="guides" class="content" style="display:none">
+<section id="guides" class="content" data-source-only="metaforge" style="display:none">
     <div class="section-header">
         <h2>Guides</h2>
         <div class="search-filter">

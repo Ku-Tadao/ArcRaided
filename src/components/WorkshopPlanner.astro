@@ -16,7 +16,7 @@ const craftable = items.filter(i => i.workbench && typeof i.workbench === 'objec
 const allItems = [...items].sort((a, b) => a.name.localeCompare(b.name));
 ---
 
-<section id="workshop" class="content" style="display:none">
+<section id="workshop" class="content" data-source-only="metaforge" style="display:none">
     <div class="section-header">
         <h2>Workshop Planner</h2>
         <div class="search-filter">

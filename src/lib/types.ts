@@ -285,6 +285,7 @@ export type ItemCategory = typeof ITEM_CATEGORIES[number];
  */
 export function categorizeItem(type: string): ItemCategory {
     const t = type.toLowerCase();
+    if (t === 'weapon') return 'Weapons';
     if (WEAPON_TYPES.includes(t as WeaponType)) return 'Weapons';
     if (t === 'recyclable') return 'Recyclables';
     if (t === 'blueprint') return 'Blueprints';

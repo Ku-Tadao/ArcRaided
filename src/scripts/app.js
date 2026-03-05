@@ -163,6 +163,7 @@
 
     function categorizeItem(type) {
         const t = (type || '').toLowerCase();
+        if (t === 'weapon') return 'Weapons';
         if (WEAPON_TYPES.includes(t)) return 'Weapons';
         if (t === 'recyclable') return 'Recyclables';
         if (t === 'blueprint') return 'Blueprints';
@@ -243,6 +244,19 @@
             }
         });
 
+        // Update weapon type counts (only meaningful for ARDB)
+        if (weaponTypeBtns.length) {
+            const weaponItems = items.filter(i => (i.category || categorizeItem(i.type)) === 'Weapons');
+            weaponTypeBtns.forEach(btn => {
+                const wt = btn.dataset.weaponType;
+                const countEl = btn.querySelector('.count');
+                if (countEl) {
+                    const count = wt === 'all' ? weaponItems.length : weaponItems.filter(i => i.type.toLowerCase() === wt).length;
+                    countEl.textContent = count;
+                }
+            });
+        }
+
         // Reset filters
         activeCategory = 'All';
         activeRarity = 'all';
@@ -286,6 +300,19 @@
         sourceBtns.forEach(b => b.classList.toggle('active', b.dataset.source === source));
         rebuildItemGrid();
         rebuildQuestGrid();
+
+        // Show/hide nav items based on data-source-only attribute
+        $$('[data-source-only]').forEach(el => {
+            const allowed = el.dataset.sourceOnly;
+            el.style.display = (allowed && allowed !== source) ? 'none' : '';
+        });
+
+        // If the currently visible section is now hidden, go back to overview
+        const visibleSection = sections.find(s => s.style.display !== 'none');
+        if (visibleSection && visibleSection.dataset.sourceOnly && visibleSection.dataset.sourceOnly !== source) {
+            showSection('overview');
+        }
+
         try { localStorage.setItem('arcraided-source', source); } catch {}
     }
 
@@ -340,9 +367,9 @@
             btn.classList.add('active');
             activeCategory = btn.dataset.category;
 
-            // Show/hide weapon-type sub-filter
+            // Show/hide weapon-type sub-filter (hide for MetaForge — no weapon subtypes)
             if (weaponTypeFilters) {
-                if (activeCategory === 'Weapons') {
+                if (activeCategory === 'Weapons' && activeSource !== 'metaforge') {
                     weaponTypeFilters.classList.remove('hidden');
                 } else {
                     weaponTypeFilters.classList.add('hidden');
@@ -1476,5 +1503,11 @@
     const savedSource = (() => { try { return localStorage.getItem('arcraided-source'); } catch { return null; } })();
     if (savedSource === 'metaforge') {
         switchSource('metaforge');
+    } else {
+        // Apply source-only visibility for default (ardb)
+        $$('[data-source-only]').forEach(el => {
+            const allowed = el.dataset.sourceOnly;
+            el.style.display = (allowed && allowed !== 'ardb') ? 'none' : '';
+        });
     }
 })();

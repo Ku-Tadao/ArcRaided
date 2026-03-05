@@ -18,7 +18,7 @@ const { items } = Astro.props;
 const sorted = [...items].filter(i => i.value > 0).sort((a, b) => b.value - a.value);
 ---
 
-<section id="marketplace" class="content" style="display:none">
+<section id="marketplace" class="content" data-source-only="ardb" style="display:none">
     <div class="section-header">
         <h2>Marketplace</h2>
         <div class="search-filter">
