@@ -61,3 +61,14 @@ export const SVG_ICONS = {
 
 /** @deprecated Use SVG_ICONS instead */
 export const icons = SVG_ICONS;
+
+export function getWeaponIconSVG(name: string): string {
+    const n = name.toLowerCase();
+    if (['stitcher', 'hairpin', 'kettle', 'burletta', 'bobcat'].includes(n)) return `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h2v12H4zm4 0h2v12H8zm4 0h2v12h-2zm4 0h2v12h-2z"/></svg>`;
+    if (['rattler', 'arpeggio', 'venator', 'renegade', 'osprey', 'torrente', 'tempest'].includes(n)) return `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v3H3zm0 5h18v3H3zm0 5h18v3H3z"/></svg>`;
+    if (['ferro', 'anvil', 'bettina', 'jupiter'].includes(n)) return `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4.6 19.4L18 6l-3.4 13.4H4.6z M18 6l2-2c.8-.8 2-.8 2.8 0 .8.8.8 2 0 2.8l-2 2L18 6z"/></svg>`;
+    if (['vulcano', 'il toro'].includes(n)) return `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>`;
+    if (['hullcracker'].includes(n)) return `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M10 2h4v4h-4zm-2 5h8v2H8zm-1 3h10v12H7z"/></svg>`;
+    if (['equalizer', 'aphelion'].includes(n)) return `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`;
+    return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`;
+}

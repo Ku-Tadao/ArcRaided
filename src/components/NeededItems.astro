@@ -46,7 +46,7 @@ const { items } = Astro.props;
     <div class="needed-grid" id="neededGrid">
         {items.map((item) => (
             <div
-                class="needed-item"
+                class={`needed-item rarity-${(item.rarity || 'common').toLowerCase()}`}
                 data-id={item.id}
                 data-name={item.name.toLowerCase()}
                 data-category={item.category}
@@ -55,10 +55,16 @@ const { items } = Astro.props;
                     <Fragment set:html={SVG_ICONS.checkSquare} />
                 </button>
                 {item.icon ? (
-                    <img src={`${ARDB_BASE}${item.icon}`} alt={item.name} loading="lazy" class="needed-item-icon" />
+                    <div class="needed-item-icon rarity-image-wrap" style="padding:4px;border-radius:6px;width:38px;height:38px;flex-shrink:0;">
+                        <div class="rarity-curve"></div>
+                        <img src={`${ARDB_BASE}${item.icon}`} alt={item.name} loading="lazy" class="item-img" style="width:100%;height:100%;object-fit:contain;" />
+                    </div>
                 ) : (
-                    <div class="needed-item-icon" style="display:flex;align-items:center;justify-content:center;opacity:0.3">
-                        <Fragment set:html={SVG_ICONS.package} />
+                    <div class="needed-item-icon rarity-image-wrap" style="padding:4px;border-radius:6px;width:38px;height:38px;flex-shrink:0;">
+                        <div class="rarity-curve"></div>
+                        <div style="display:flex;align-items:center;justify-content:center;opacity:0.3;z-index:2;width:100%;height:100%;">
+                            <Fragment set:html={SVG_ICONS.package} />
+                        </div>
                     </div>
                 )}
                 <div class="needed-item-info">

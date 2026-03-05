@@ -2,7 +2,7 @@
 /**
  * Loot Value Tiers — groups items into value brackets
  */
-import { SVG_ICONS } from '@/lib/icons';
+import { SVG_ICONS, getWeaponIconSVG } from '@/lib/icons';
 import type { ArdbItem } from '@/lib/types';
 import { ARDB_BASE } from '@/lib/types';
 
@@ -56,20 +56,23 @@ const tierGroups = tiers.map(tier => {
                     <div class="tier-items">
                         {group.items.slice(0, 20).map((item) => (
                             <div class={`item-card rarity-${item.rarity ?? 'common'}`} data-id={item.id}>
-                                {item.icon ? (
-                                    <img src={`${ARDB_BASE}${item.icon}`} alt={item.name} loading="lazy" class="item-card-icon" />
-                                ) : (
-                                    <div class="item-card-icon" style="display:flex;align-items:center;justify-content:center;opacity:0.3">
-                                        <Fragment set:html={SVG_ICONS.package} />
-                                    </div>
-                                )}
-                                <div class="item-card-info">
-                                    <div class="item-card-name">{item.name}</div>
-                                    <div class="item-card-meta">
-                                        <span class={`rarity-badge ${item.rarity ?? 'common'}`}>{item.rarity ?? 'common'}</span>
-                                    </div>
+                                <div class="rarity-image-wrap item-card-image-wrap">
+                                    <div class="rarity-curve"></div>
+                                    {item.icon ? (
+                                        <img src={`${ARDB_BASE}${item.icon}`} alt={item.name} loading="lazy" class="item-img" />
+                                    ) : (
+                                        <div style="display:flex;align-items:center;justify-content:center;opacity:0.3;width:100%;height:100%">
+                                            <Fragment set:html={SVG_ICONS.package} />
+                                        </div>
+                                    )}
+                                    <div class="item-value-badge">{item.value?.toLocaleString()}</div>
                                 </div>
-                                <span class="item-value">{item.value.toLocaleString()}</span>
+                                <div class="item-card-footer">
+                                    <span class="item-type-icon">
+                                        <Fragment set:html={getWeaponIconSVG(item.name)} />
+                                    </span>
+                                    <span class="item-card-name">{item.name}</span>
+                                </div>
                             </div>
                         ))}
                         {group.items.length > 20 && (

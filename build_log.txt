@@ -1,0 +1,40 @@
+
+> arcraided@1.0.0 build
+> astro build
+
+[2m15:24:43[22m [34m[content][39m Syncing content
+[2m15:24:43[22m [34m[content][39m Synced content
+[2m15:24:43[22m [34m[types][39m Generated [2m35ms[22m
+[2m15:24:43[22m [34m[build][39m output: [34m"static"[39m
+[2m15:24:43[22m [34m[build][39m mode: [34m"static"[39m
+[2m15:24:43[22m [34m[build][39m directory: [34mC:\Users\user\Desktop\ku-tadao\ArcRaided\dist\[39m
+[2m15:24:43[22m [34m[build][39m Collecting build info...
+[2m15:24:43[22m [34m[build][39m [32mΓ£ô Completed in 55ms.[39m
+[2m15:24:43[22m [34m[build][39m Building static entrypoints...
+[2m15:24:44[22m [34m[vite][39m [32mΓ£ô built in 1.09s[39m
+[2m15:24:44[22m [34m[build][39m [32mΓ£ô Completed in 1.12s.[39m
+
+[42m[30m building client (vite) [39m[49m
+[2m15:24:44[22m [34m[vite][39m transforming...
+[2m15:24:44[22m [34m[vite][39m [32mΓ£ô[39m 11 modules transformed.
+[2m15:24:44[22m [34m[vite][39m rendering chunks...
+[2m15:24:44[22m [34m[vite][39m computing gzip size...
+[2m15:24:44[22m [34m[vite][39m [2mdist/[22m[36m_assets/client.BPIG0_ha.js                                      [39m[1m[2m 0.06 kB[22m[1m[22m[2m Γöé gzip: 0.08 kB[22m
+[2m15:24:44[22m [34m[vite][39m [2mdist/[22m[36m_assets/signals.module.Bs4GM18l.js                              [39m[1m[2m 9.25 kB[22m[1m[22m[2m Γöé gzip: 3.52 kB[22m
+[2m15:24:44[22m [34m[vite][39m [2mdist/[22m[36m_assets/client.Bzw1_CcN.js                                      [39m[1m[2m12.34 kB[22m[1m[22m[2m Γöé gzip: 5.35 kB[22m
+[2m15:24:44[22m [34m[vite][39m [2mdist/[22m[36m_assets/index.astro_astro_type_script_index_0_lang.DXzCgpbX.js  [39m[1m[2m41.84 kB[22m[1m[22m[2m Γöé gzip: 9.99 kB[22m
+[2m15:24:44[22m [34m[vite][39m [32mΓ£ô built in 214ms[39m
+
+[42m[30m generating static routes [39m[49m
+[2m15:24:44[22m [32mΓû╢[39m src/pages/index.astro
+[api] 522 from https://arcraided-api-proxy.kubilay12344.workers.dev/proxy/arc/api/v1/traders
+[api] falling back for /proxy/arc/api/v1/traders
+[api] 522 from https://arcraided-api-proxy.kubilay12344.workers.dev/proxy/arc/api/v1/maps
+[api] falling back for /proxy/arc/api/v1/maps
+[api] 522 from https://arcraided-api-proxy.kubilay12344.workers.dev/proxy/arc/api/v1/skills?limit=100&offset=0
+[api] falling back for /proxy/arc/api/v1/skills?limit=100&offset=0
+[2m15:24:44[22m   [34mΓööΓöÇ[39m [2m/index.html[22m [31m(+19.69s)[39m 
+[2m15:25:04[22m [32mΓ£ô Completed in 19.71s.
+[39m
+[2m15:25:04[22m [34m[build][39m 1 page(s) built in [1m21.12s[22m
+[2m15:25:04[22m [34m[build][39m [1mComplete![22m
