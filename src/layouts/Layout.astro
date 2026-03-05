@@ -45,36 +45,36 @@ const {
     <nav>
         <div class="container nav-wrap">
             <div class="nav-inner">
-                <button class="nav-link active" data-section="overview" type="button">Home</button>
+                <button class="nav-link active" data-section="overview" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.grid} /> Home</button>
 
                 <div class="nav-dropdown">
-                    <button class="nav-link nav-dropdown-trigger" type="button">Database ▾</button>
+                    <button class="nav-link nav-dropdown-trigger" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.layers} /> Database ▾</button>
                     <div class="nav-dropdown-menu hidden">
-                        <button class="nav-dd-item" data-section="items" type="button"><span class="nav-dd-icon">📦</span> Items</button>
-                        <button class="nav-dd-item" data-section="enemies" data-source-only="ardb" type="button"><span class="nav-dd-icon">🎯</span> ARCs</button>
-                        <button class="nav-dd-item" data-section="quests" type="button"><span class="nav-dd-icon">📜</span> Quests</button>
-                        <button class="nav-dd-item" data-section="traders" type="button"><span class="nav-dd-icon">👥</span> Traders</button>
-                        <button class="nav-dd-item" data-section="maps" data-source-only="ardb" type="button"><span class="nav-dd-icon">🗺️</span> Maps</button>
+                        <button class="nav-dd-item" data-section="items" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.package} /> Items</button>
+                        <button class="nav-dd-item" data-section="enemies" data-source-only="ardb" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.target} /> ARCs</button>
+                        <button class="nav-dd-item" data-section="quests" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.scroll} /> Quests</button>
+                        <button class="nav-dd-item" data-section="traders" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.users} /> Traders</button>
+                        <button class="nav-dd-item" data-section="maps" data-source-only="ardb" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.map} /> Maps</button>
                     </div>
                 </div>
 
                 <div class="nav-dropdown">
-                    <button class="nav-link nav-dropdown-trigger" type="button">Tools ▾</button>
+                    <button class="nav-link nav-dropdown-trigger" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.wrench} /> Tools ▾</button>
                     <div class="nav-dropdown-menu hidden">
-                        <button class="nav-dd-item" data-section="marketplace" data-source-only="ardb" type="button"><span class="nav-dd-icon">🏪</span> Marketplace</button>
-                        <button class="nav-dd-item" data-section="loot-tiers" data-source-only="ardb" type="button"><span class="nav-dd-icon">💎</span> Loot Value Tiers</button>
-                        <button class="nav-dd-item" data-section="needed-items" type="button"><span class="nav-dd-icon">✅</span> Needed Items</button>
-                        <button class="nav-dd-item" data-section="blueprints" type="button"><span class="nav-dd-icon">📋</span> Blueprint Tracker</button>
-                        <button class="nav-dd-item" data-section="workshop" data-source-only="metaforge" type="button"><span class="nav-dd-icon">🔧</span> Workshop Planner</button>
-                        <button class="nav-dd-item" data-section="loadouts" data-source-only="metaforge" type="button"><span class="nav-dd-icon">🎒</span> Loadouts</button>
-                        <button class="nav-dd-item" data-section="tier-lists" type="button"><span class="nav-dd-icon">📊</span> Tier Lists</button>
+                        <button class="nav-dd-item" data-section="marketplace" data-source-only="ardb" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.store} /> Marketplace</button>
+                        <button class="nav-dd-item" data-section="loot-tiers" data-source-only="ardb" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.star} /> Loot Value Tiers</button>
+                        <button class="nav-dd-item" data-section="needed-items" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.checkSquare} /> Needed Items</button>
+                        <button class="nav-dd-item" data-section="blueprints" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.clipboard} /> Blueprint Tracker</button>
+                        <button class="nav-dd-item" data-section="workshop" data-source-only="metaforge" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.wrench} /> Workshop Planner</button>
+                        <button class="nav-dd-item" data-section="loadouts" data-source-only="metaforge" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.crosshair} /> Loadouts</button>
+                        <button class="nav-dd-item" data-section="tier-lists" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.barChart} /> Tier Lists</button>
                     </div>
                 </div>
 
-                <button class="nav-link" data-section="skills" data-source-only="metaforge" type="button">Skill Tree</button>
-                <button class="nav-link" data-section="guides" data-source-only="metaforge" type="button">Guides</button>
-                <button class="nav-link" data-section="events" data-source-only="metaforge" type="button">Events</button>
-                <button class="nav-link" data-section="weekly-trials" data-source-only="metaforge" type="button">Weekly Trials</button>
+                <button class="nav-link" data-section="skills" data-source-only="metaforge" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.zap} /> Skill Tree</button>
+                <button class="nav-link" data-section="guides" data-source-only="metaforge" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.book} /> Guides</button>
+                <button class="nav-link" data-section="events" data-source-only="metaforge" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.calendar} /> Events</button>
+                <button class="nav-link" data-section="weekly-trials" data-source-only="metaforge" type="button"><span class="nav-dd-icon" set:html={SVG_ICONS.clock} /> Weekly Trials</button>
             </div>
             <div class="nav-right">
                 <div class="source-toggle" id="sourceToggle">
