@@ -80,6 +80,23 @@ export interface QuestStep {
     amount?: number;
 }
 
+export interface MetaForgeMapMarker {
+    id: string;
+    lat: number;
+    lng: number;
+    zlayers?: number;
+    mapID: string;
+    category: string;
+    subcategory: string;
+    instanceName?: string | null;
+    added_by?: string;
+    behindLockedDoor?: boolean;
+    last_edited_by?: string | null;
+    updated_at?: string;
+    eventConditionMask?: number;
+    lootAreas?: any;
+}
+
 // ---------- MetaForge ARC Enemy ----------
 export interface MetaForgeArc {
     id: string;
@@ -223,6 +240,7 @@ export interface ArcRaidedData {
     metaforge: {
         items: MetaForgeItem[];
         quests: MetaForgeQuest[];
+        mapMarkers: Record<string, MetaForgeMapMarker[]>;
     };
     skills: ArcSkill[];
     arcMaps: ArcMap[];

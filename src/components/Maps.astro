@@ -90,14 +90,16 @@ const mapColors: Record<string, string> = {
 };
 ---
 
-<section id="maps" class="content" data-source-only="ardb" style="display:none">
+<section id="maps" class="content" style="display:none">
     <div class="section-header">
         <h2>Maps</h2>
     </div>
-
-    {allMaps.length === 0 ? (
-        <p class="no-results">No map data available.</p>
-    ) : (
+    
+    <!-- Classic List View -->
+    <div id="classicMapView">
+        {allMaps.length === 0 ? (
+            <p class="no-results">No map data available.</p>
+        ) : (
         <div class="maps-grid" id="mapGrid">
             {allMaps.map((map) => {
                 const color = mapColors[map.name] ?? 'var(--brand)';
@@ -130,4 +132,5 @@ const mapColors: Record<string, string> = {
             })}
         </div>
     )}
+    </div>
 </section>

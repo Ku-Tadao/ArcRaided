@@ -7,6 +7,8 @@ import { getVersionedStore, setVersionedStore } from '../lib/client/storage';
 import { renderItemCard as renderTemplateItemCard } from '../lib/client/templates';
 import type { ArdbItem, MetaForgeItem, ArdbEnemy, MetaForgeArc, ArdbQuest, MetaForgeQuest, ArcSkill, ArcMap, ArcTrader } from "../lib/types";
 
+
+
 const ARDB_BASE = 'https://ardb.app/static';
 
     // ---------- Helpers ----------
@@ -145,9 +147,7 @@ const ARDB_BASE = 'https://ardb.app/static';
 
     // ---------- Client Data ----------
     const appDataEl = document.getElementById('app-data');
-    const DATA: { metaforge?: { items?: any[], quests?: any[] }, items?: any[], quests?: any[], enemies?: any[], [key: string]: any } = appDataEl ? JSON.parse(appDataEl.dataset.payload || '{}') : {};
-
-    // ---------- Data Source Toggle ----------
+    const DATA: { metaforge?: { items?: any[], quests?: any[], mapMarkers?: any }, items?: any[], quests?: any[], enemies?: any[], [key: string]: any } = appDataEl ? JSON.parse(appDataEl.dataset.payload || '{}') : {};// ---------- Data Source Toggle ----------
     let activeSource = 'ardb';
     const sourceBtns = $$('#sourceToggle .source-btn');
 

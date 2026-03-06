@@ -9,6 +9,7 @@ import type {
     MetaForgeQuest,
     MetaForgeTrader,
     MetaForgeEvent,
+    MetaForgeMapMarker,
     ArcRaidedData,
     ArcSkill,
     ArcMap,
@@ -163,6 +164,8 @@ async function fetchWeeklyTrials(): Promise<WeeklyTrial[]> {
     const arr = raw?.data ?? raw;
     return Array.isArray(arr) ? arr : [];
 }
+
+
 
 // ---------- Main aggregation ----------
 
